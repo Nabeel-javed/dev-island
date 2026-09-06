@@ -4,7 +4,7 @@ import {Html} from '@react-three/drei';
 import {useEffect,useMemo,useRef} from 'react';
 import * as THREE from 'three';
 import {AVATARS,PALETTES,PLOTS,TREES,seed} from '@/lib/island';
-import {SceneProps} from './pixel-island';
+import type {SceneProps} from './pixel-island';
 const V=(x:number,y:number,z:number):[number,number,number]=>[x,y,z];
 function Box({position,size,color,...rest}:{position:[number,number,number];size:[number,number,number];color:string;rotation?:[number,number,number]}) {return <mesh position={position} {...rest} castShadow receiveShadow><boxGeometry args={size}/><meshStandardMaterial color={color} roughness={.85}/></mesh>}
 function Tree({x,z,index,color,motion}:{x:number;z:number;index:number;color:string;motion:boolean}){const crown=useRef<THREE.Group>(null);useFrame(({clock})=>{if(crown.current&&motion)crown.current.rotation.z=Math.sin(clock.elapsedTime*.7+index)*.018;});return <group position={[x,.22,z]}><mesh position={[0,.6,0]} castShadow><cylinderGeometry args={[.12,.17,1.2,6]}/><meshStandardMaterial color="#90704e"/></mesh><group ref={crown}><mesh position={[0,1.55,0]} castShadow><icosahedronGeometry args={[.85,1]}/><meshStandardMaterial color={color} flatShading/></mesh><mesh position={[-.28,2.13,0]} castShadow><icosahedronGeometry args={[.65,1]}/><meshStandardMaterial color="#90ae78" flatShading/></mesh><mesh position={[.48,1.75,.15]} castShadow><icosahedronGeometry args={[.58,0]}/><meshStandardMaterial color={color} flatShading/></mesh></group></group>}
@@ -61,4 +61,5 @@ function World(props:SceneProps){const p=PALETTES[props.palette];const ready=use
  <Boat motion={!props.reducedMotion}/><Explorer props={props}/>
  </>;
 }
-export default function ThreeIsland(props:SceneProps){return <div className="scene-render three-render" role="img" aria-label="Playable miniature 3D island"><Canvas shadows orthographic camera={{position:[14,18,22],zoom:28,near:.1,far:150}} dpr={[1,1.5]} gl={{antialias:true,preserveDrawingBuffer:true}} fallback={<p>3D graphics are unavailable. Choose Pixel island or explore the project list below.</p>}><World {...props}/></Canvas></div>}
+function GraphicsFallback({onReady}:{onReady:()=>void}){useEffect(onReady,[onReady]);return <div className="scene-fallback"><p>3D graphics are unavailable.</p><p>Choose Pixel island or explore the project list below.</p></div>;}
+export default function ThreeIsland(props:SceneProps){return <div className="scene-render three-render" role="img" aria-label="Playable miniature 3D island"><Canvas shadows orthographic camera={{position:[14,18,22],zoom:28,near:.1,far:150}} dpr={[1,1.5]} gl={{antialias:true,preserveDrawingBuffer:true}} fallback={<GraphicsFallback onReady={props.onReady}/>}><World {...props}/></Canvas></div>}

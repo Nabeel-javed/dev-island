@@ -27,7 +27,7 @@ export function selectProjects(pinned: Project[], owned: Project[]) {
 }
 export function readAppearance(params: URLSearchParams) {
   return {style: params.get('style')==='3d'?'3d' as const:'pixel' as const,
-    palette: (params.get('palette') && params.get('palette')! in PALETTES ? params.get('palette') : 'lagoon') as PaletteId,
+    palette: (params.get('palette') && Object.hasOwn(PALETTES, params.get('palette')!) ? params.get('palette') : 'lagoon') as PaletteId,
     avatar: (AVATARS.some(a=>a.id===params.get('avatar'))?params.get('avatar'):'explorer') as AvatarId};
 }
 export function canWalk(x:number,y:number, count=6) {

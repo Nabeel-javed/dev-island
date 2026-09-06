@@ -13,7 +13,7 @@ export default function PixelIsland(props:SceneProps){const host=useRef<HTMLDivE
         update(time:number,delta:number){if(!this.texture)return;const p=latest.current;p.controller.current.step(delta/1000);paintIsland(this.texture.context,p.island,p.palette,p.avatar,p.controller.current,p.reducedMotion?0:time);this.texture.refresh();}
       }
       game=new Phaser.Game({type:Phaser.AUTO,parent:host.current,width:W,height:H,backgroundColor:'#b6d8d4',pixelArt:true,antialias:false,scene:Village,scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},render:{preserveDrawingBuffer:true},audio:{noAudio:true},banner:false});
-    }).catch(()=>{if(host.current)host.current.textContent='The pixel scene could not load. Your projects are available below.';});
+    }).catch(()=>{latest.current.onReady();if(host.current){host.current.classList.add('scene-fallback');host.current.textContent='The pixel scene could not load. Your projects are available below.';}});
     return()=>{cancelled=true;game?.destroy(true);};},[]);
   return <div ref={host} className="scene-render pixel-render" aria-label="Playable pixel island" role="img"/>;
 }
