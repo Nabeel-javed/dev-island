@@ -1,7 +1,14 @@
 import './globals.css';
 import type { Metadata } from 'next';
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL || 'http://localhost:3100'),
+  metadataBase: new URL(
+    process.env.SITE_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3100'),
+  ),
   openGraph: { images: ['/api/og'] },
   twitter: { card: 'summary_large_image', images: ['/api/og'] },
   title: 'Dev Island — Your code, a world of its own',
