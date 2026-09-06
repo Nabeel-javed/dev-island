@@ -138,7 +138,11 @@ function House({ index, props }: { index: number; props: SceneProps }) {
     </group>
   );
 }
-function Explorer({ props }: { props: SceneProps }) {
+export function Explorer({
+  props,
+}: {
+  props: Pick<SceneProps, 'avatar' | 'controller' | 'reducedMotion'>;
+}) {
   const body = useRef<THREE.Group>(null),
     left = useRef<THREE.Mesh>(null),
     right = useRef<THREE.Mesh>(null);
@@ -158,7 +162,7 @@ function Explorer({ props }: { props: SceneProps }) {
     }
   });
   return (
-    <group ref={body} position={[0, 0.26, 6.1]}>
+    <group ref={body} position={[props.controller.current.x, 0.26, props.controller.current.y]}>
       <mesh position={[-0.105, 0.14, 0]} ref={left} castShadow>
         <boxGeometry args={[0.15, 0.27, 0.2]} />
         <meshStandardMaterial color="#485b56" />
