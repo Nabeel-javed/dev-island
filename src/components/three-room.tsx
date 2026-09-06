@@ -61,6 +61,13 @@ function Room(props: RoomSceneProps) {
       <Box at={[0, 0.45, -4.67]} size={[12.5, 0.3, 0.12]} color="#b79b76" />
       <Box at={[-6.17, 0.45, 0]} size={[0.12, 0.3, 9.6]} color="#b79b76" />
       <Box at={[0, 3.3, -4.8]} size={[12.8, 0.12, 0.24]} color={colors.accent} />
+      <Box at={[-2.05, 2.45, -4.63]} size={[0.8, 0.95, 0.1]} color="#a58a65" />
+      <Box at={[-2.05, 2.45, -4.56]} size={[0.65, 0.8, 0.03]} color="#f7edda" />
+      <Box
+        at={[-2.05, 2.45, -4.53]}
+        size={[0.34, 0.43, 0.02]}
+        color={['#be866b', '#83996d', '#9c91aa'][seed(props.identity) % 3]}
+      />
       <Box at={[0, 0.279, 0.7]} size={[4.6, 0.025, 3.4]} color={colors.accent} />
       <Box at={[0, 0.294, 0.7]} size={[4.25, 0.008, 3.05]} color={colors.light} />
       <Box at={[0, 0.3, 0.7]} size={[3.9, 0.008, 2.7]} color={colors.grass} />
