@@ -19,7 +19,14 @@ Open **http://localhost:3100**. The fictional sample world works entirely withou
 
 ## Explore
 
-Walk with **WASD / arrow keys**, or the directional buttons on a phone. Press **E** near a building to open its project. Buildings can also be clicked, and every project has a normal HTML card below the scene. **Escape** closes a dialog.
+Walk with **WASD / arrow keys**, or the directional buttons on a phone. Press **Enter or E** near a building to enter its project room. Buildings can also be clicked, and every project has a normal HTML card below the scene. **Escape** closes a reading panel first, then returns to the island.
+
+Inside each project room, explore four stations: an overview board, README bookshelf, technology desk, and demo display. Walk up and press **Enter/E**, click the furniture, or use the station buttons. Desktop uses a side panel; phones use a full-screen reading panel. Back to island and the exit return you to the building’s doorway.
+
+- [Sample pixel room](http://localhost:3100/?style=pixel&project=demo%2Fmoss-ui)
+- [Sample 3D room](http://localhost:3100/?style=3d&project=demo%2Fmoss-ui)
+
+**Share room** copies a direct room link. Browser Back returns to the exterior after entering a room. Invalid room links fall back to the island with an explanation. The existing postcard download exports the exterior island.
 
 Choose one of four explorers and three palettes. The current style and appearance are saved in the URL. Share copies this link; the download button exports a PNG postcard. Visitors do not need accounts.
 
@@ -39,11 +46,20 @@ Profiles are cached for six hours. Concurrent requests for the same profile with
 
 The `demo` name is reserved for the fictional sample. Organization profiles are not supported. A generated island is a visualization of public data, not an identity claim or endorsement by its profile owner.
 
+## Project room data
+
+Rooms fetch details on entry through `/api/project/[owner]/[repo]`: public repository metadata, sanitized README content, language breakdown, and repository topics. Canonical owner/name identifiers support pinned repositories owned by someone else.
+
+README rendering supports Markdown, tables, code blocks, supported HTML, relative links, and images. Scripts, frames, event handlers, and unsafe link protocols are removed. Introductions and feature text are excerpts, without AI-generated claims. The gallery takes up to six README images, excluding common badges; images load in the visitor’s browser and retain their original owners’ rights. Website and source links open separate tabs.
+
+README display is capped at 200 KiB with a GitHub link for larger documents. Missing documentation has an explicit empty state. Failed optional sections remain independent, with retry; incomplete responses are cached for one minute. Complete details use a separate six-hour cache, coalesced requests, and up to seven-day stale fallback on temporary outages. Confirmed unavailable/private repository responses invalidate their detail cache. The shared Redis namespace is `project:v1`; island summaries use `island:v2` after adding repository owners.
+
 ## Architecture
 
 - **Next.js / React / TypeScript:** application shell, shareable pages, server API, social images.
 - **Phaser:** original pixel artwork, animation and hit testing.
 - **Three.js / React Three Fiber:** original low-poly models, orthographic camera and instanced contribution garden.
+- **Rooms:** Canvas 2D pixel interiors and primitive 3D interiors share furniture locations, collision, interaction zones, and repository-based decoration. Only the current scene is mounted.
 - Shared model, project selection, appearance parsing, movement and collision rules feed both renderers. Only the selected renderer is mounted.
 - All artwork is produced locally from code. No runtime AI calls, externally hosted fonts, or purchased asset packs.
 
@@ -53,6 +69,8 @@ The `demo` name is reserved for the fictional sample. Organization profiles are 
 | `/u/[username]`                | Public profile island                                                      |
 | `/api/island/[username]`       | Normalized profile, featured projects, contributions, source and timestamp |
 | `/api/og?username=…&palette=…` | 1200 × 630 PNG social card                                                 |
+
+Room links add `project=owner/repository`, restricted in the UI to that island’s featured projects.
 
 Share parameters: `style=pixel\|3d`, `palette=lagoon\|sunset\|lavender`, and `avatar=explorer\|gardener\|sailor\|astronaut`. Invalid appearance values use defaults.
 
