@@ -1954,3 +1954,387 @@ footer button {
     animation: none;
   }
 }
+
+/* The island guide and the visitor's exploration passport. */
+.island-guide {
+  position: absolute;
+  z-index: 20;
+  top: 64px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px 7px 5px;
+  border: 1px solid #d0d9c3;
+  border-radius: 12px;
+  background: #fbf8eade;
+  box-shadow: 0 3px 14px #32543a09;
+  color: #47613c;
+  text-align: left;
+}
+.island-guide strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+}
+.island-guide small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  font-size: 9px;
+  color: #829171;
+}
+.guide-character {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 45px;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+.guide-character i {
+  position: absolute;
+  display: block;
+}
+.guide-head {
+  top: 12px;
+  left: 13px;
+  width: 15px;
+  height: 14px;
+  background: #d5a479;
+  box-shadow: inset 0 -2px #b17b52;
+}
+.guide-head::before,
+.guide-head::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  width: 2px;
+  height: 2px;
+  background: #374b3f;
+}
+.guide-head::before {
+  left: 3px;
+}
+.guide-head::after {
+  right: 3px;
+}
+.guide-hat {
+  top: 5px;
+  left: 11px;
+  width: 19px;
+  height: 9px;
+  background: #7e9069;
+  z-index: 1;
+  border-bottom: 2px solid #536c48;
+}
+.guide-hat::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: -4px;
+  height: 3px;
+  width: 27px;
+  background: #7e9069;
+}
+.guide-coat {
+  top: 26px;
+  left: 11px;
+  width: 19px;
+  height: 15px;
+  background: #65917e;
+  box-shadow:
+    -4px 0 #d5a479,
+    4px 0 #d5a479;
+}
+.guide-coat::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 2px;
+  width: 5px;
+  height: 4px;
+  background: #485747;
+  box-shadow: 9px 0 #485747;
+}
+.guide-scarf {
+  top: 25px;
+  left: 11px;
+  width: 19px;
+  height: 3px;
+  background: #d1ad64;
+}
+.guide-introduction {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.guide-introduction .guide-character {
+  transform: scale(1.3);
+  margin: 7px 8px;
+}
+.guide-dialog blockquote {
+  margin: 20px 0;
+  padding: 14px 18px;
+  background: #eef1e5;
+  border-left: 3px solid #a2b68d;
+  color: #6f7f62;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.guide-dialog blockquote span {
+  display: block;
+  letter-spacing: 1px;
+  font-size: 8px;
+  color: #859476;
+  margin-bottom: 7px;
+}
+.guide-route {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+  font-size: 13px;
+  color: #52714c;
+}
+.guide-route small {
+  display: block;
+  font-size: 10px;
+  margin-top: 5px;
+  color: #8c977d;
+}
+.guide-start {
+  width: 100%;
+  border: 0;
+  background: #285f4e;
+  color: #f8f5e7;
+  border-radius: 9px;
+  padding: 13px 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.guide-skip {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #839073;
+  font-size: 11px;
+  padding: 15px 5px 0;
+}
+.explorer-passport {
+  padding: 20px;
+  margin: 0 0 8px;
+  border-top: 1px dashed #d3dbc6;
+  border-bottom: 1px dashed #d3dbc6;
+}
+.explorer-passport-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #5d7952;
+}
+.explorer-passport-title h3 {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0;
+}
+.explorer-passport > p {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #839174;
+  margin: 10px 0 14px;
+}
+.passport-stamp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 6px;
+}
+.passport-stamp-grid button {
+  min-width: 0;
+  border: 0;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: #a2ac95;
+  padding: 0;
+}
+.passport-stamp-grid button > span {
+  height: 40px;
+  width: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #cbd4be;
+  border-radius: 50%;
+  font: 11px monospace;
+}
+.passport-stamp-grid small {
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8px;
+}
+.passport-stamp-grid .stamp-earned {
+  color: #568053;
+}
+.passport-stamp-grid .stamp-earned > span {
+  background: #e8efdc;
+  border: 2px double #89a470;
+  outline: 1px dashed #89a470;
+  outline-offset: -5px;
+  transform: rotate(-8deg);
+}
+.passport-stamp-grid button:hover > span {
+  background: #e6eddb;
+}
+.passport-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 16px;
+  font-size: 10px;
+  color: #688459;
+}
+.passport-progress-label small {
+  color: #94a084;
+  font-size: 8px;
+}
+.explorer-passport progress {
+  width: 100%;
+  height: 5px;
+  appearance: none;
+  border: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #e5e9db;
+}
+.explorer-passport progress::-webkit-progress-bar {
+  background: #e5e9db;
+}
+.explorer-passport progress::-webkit-progress-value {
+  background: #8da66e;
+}
+.explorer-passport progress::-moz-progress-bar {
+  background: #8da66e;
+}
+.passport-complete {
+  background: #f0f3e7;
+}
+.passport-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 17px;
+  gap: 9px;
+  color: #64814e;
+}
+.passport-reward strong {
+  font-size: 13px;
+}
+.passport-reward button,
+.passport-reward a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 7px;
+  padding: 9px;
+  font-size: 10px;
+}
+.passport-reward button {
+  background: #3c6950;
+  color: #f9f5e7;
+}
+.passport-reward a {
+  color: #688258;
+}
+.room-tour {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 28px;
+  background: #eef1df;
+  border-bottom: 1px solid #d7dec6;
+  color: #5b764f;
+}
+.room-tour > div {
+  flex: 1;
+  min-width: 0;
+}
+.room-tour strong {
+  font-size: 11px;
+}
+.room-tour p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  color: #7e8e6e;
+}
+.room-tour button {
+  border: 1px solid #b6c7a2;
+  border-radius: 7px;
+  background: #f8f7ec;
+  padding: 8px 11px;
+  color: #5a774c;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.room-tour .tour-next {
+  background: #3d6a50;
+  color: #f8f5e7;
+  border-color: #3d6a50;
+}
+@media (max-width: 760px) {
+  .island-guide {
+    top: 51px;
+    left: 10px;
+    padding: 4px 9px 4px 2px;
+  }
+  .island-guide strong {
+    font-size: 9px;
+  }
+  .island-guide small {
+    font-size: 8px;
+  }
+  .island-guide .guide-character {
+    transform: scale(0.85);
+    margin: -4px;
+  }
+  .passport > .explorer-passport {
+    grid-column: 1 / -1;
+    padding: 18px;
+  }
+  .passport-stamp-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .room-tour {
+    padding: 8px 13px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .room-tour .guide-character {
+    display: none;
+  }
+  .room-tour > div {
+    flex-basis: calc(100% - 120px);
+  }
+  .room-tour p {
+    font-size: 10px;
+  }
+  .room-tour button {
+    font-size: 10px;
+    padding: 7px;
+  }
+  .room-tour .tour-stop {
+    border: 0;
+    background: transparent;
+  }
+}
