@@ -24,12 +24,15 @@ import {
   compact,
   Island,
   PALETTES,
+  PLOTS,
   PaletteId,
   readAppearance,
   StyleId,
   validUsername,
 } from '@/lib/island';
 import { useController } from './use-controller';
+import { projectKey } from '@/lib/project';
+const ProjectRoom = dynamic(() => import('./project-room'), { ssr: false });
 const Pixel = dynamic(() => import('./pixel-island'), { ssr: false });
 const Three = dynamic(() => import('./three-island'), { ssr: false });
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -81,12 +84,73 @@ export default function IslandApp({
   const stage = useRef<HTMLDivElement>(null),
     dialog = useRef<HTMLDialogElement>(null),
     timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const select = useCallback((i: number) => {
-    setSelected(i);
-    setVisited((v) => (v.includes(i) ? v : [...v, i]));
-  }, []);
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+  const select = useCallback(
+    (i: number) => {
+      const p = island.projects[i];
+      if (!p) return;
+      const url = new URL(window.location.href);
+      url.searchParams.set('project', projectKey(p.owner, p.name));
+      window.history.pushState({ ...window.history.state, devIslandRoom: true }, '', url);
+      setSelected(i);
+      setVisited((v) => (v.includes(i) ? v : [...v, i]));
+    },
+    [island.projects],
+  );
   const controller = useController(island.projects.length, select, selected !== null || about);
   const onReady = useCallback(() => setReady(true), []);
+  const restoreDoorway = useCallback(() => {
+    const i = selectedRef.current;
+    if (i !== null && PLOTS[i]) {
+      Object.assign(controller.current, { x: PLOTS[i].x, y: PLOTS[i].y + 1.5, moving: false });
+      controller.current.keys.clear();
+      setReady(false);
+    }
+  }, [controller]);
+  const exitRoom = useCallback(() => {
+    restoreDoorway();
+    if (window.history.state?.devIslandRoom) window.history.back();
+    else {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('project');
+      window.history.replaceState({ ...window.history.state, devIslandRoom: false }, '', url);
+      setSelected(null);
+    }
+  }, [restoreDoorway]);
+  useEffect(() => {
+    const sync = () => {
+      const url = new URL(window.location.href),
+        key = url.searchParams.get('project');
+      const index = key
+        ? island.projects.findIndex((p) => projectKey(p.owner, p.name) === key.toLowerCase())
+        : -1;
+      if (index >= 0) {
+        setSelected(index);
+        setVisited((v) => (v.includes(index) ? v : [...v, index]));
+      } else {
+        restoreDoorway();
+        setSelected(null);
+        if (key) {
+          url.searchParams.delete('project');
+          window.history.replaceState({ ...window.history.state, devIslandRoom: false }, '', url);
+          setToast('That room is not among this island’s featured projects.');
+        }
+      }
+    };
+    sync();
+    window.addEventListener('popstate', sync);
+    return () => window.removeEventListener('popstate', sync);
+  }, [island.projects, restoreDoorway]);
+  const hadRoom = useRef(false);
+  useEffect(() => {
+    if (selected !== null) hadRoom.current = true;
+    else if (hadRoom.current) {
+      hadRoom.current = false;
+      stage.current?.scrollIntoView({ block: 'center' });
+      stage.current?.focus({ preventScroll: true });
+    }
+  }, [selected]);
   useEffect(() => {
     const q = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(q.matches);
@@ -98,9 +162,9 @@ export default function IslandApp({
     };
   }, []);
   useEffect(() => {
-    if (selected !== null || about) dialog.current?.showModal();
+    if (about) dialog.current?.showModal();
     else dialog.current?.close();
-  }, [selected, about]);
+  }, [about]);
   const notify = (s: string) => {
     setToast(s);
     if (timer.current) clearTimeout(timer.current);
@@ -196,6 +260,18 @@ export default function IslandApp({
   }
   const project = selected === null ? null : island.projects[selected];
   const stars = island.projects.reduce((n, p) => n + p.stars, 0);
+  if (project)
+    return (
+      <ProjectRoom
+        key={projectKey(project.owner, project.name)}
+        project={project}
+        style={style}
+        palette={palette}
+        avatar={avatar}
+        reducedMotion={reducedMotion}
+        onExit={exitRoom}
+      />
+    );
   return (
     <>
       <header className="site-header">
@@ -640,46 +716,6 @@ export default function IslandApp({
               The sample island uses a fictional profile and illustrative data. Generated islands
               show public GitHub information and do not imply profile-owner endorsement.
             </p>
-          </>
-        ) : project ? (
-          <>
-            <span className="eyebrow">
-              PROJECT {String(selected! + 1).padStart(2, '0')} · {visited.length} DISCOVERED
-            </span>
-            <div className={'dialog-project-icon symbol-' + selected}>
-              <Code2 size={30} />
-            </div>
-            <h2>{project.name}</h2>
-            <p>
-              {project.description ||
-                'This project has no description yet. Visit GitHub to explore its code.'}
-            </p>
-            <div className="dialog-stats">
-              <span>{project.language || 'Code'}</span>
-              <span>
-                <Star size={15} />
-                {compact(project.stars)} stars
-              </span>
-            </div>
-            {island.source === 'demo' ? (
-              <div className="about-note">
-                <Leaf size={20} />
-                <span>
-                  This is a sample project. Generate your island to explore real repositories.
-                </span>
-              </div>
-            ) : (
-              <div className="dialog-links">
-                <a href={project.url} target="_blank" rel="noopener noreferrer">
-                  Explore on GitHub <ArrowUpRight size={16} />
-                </a>
-                {project.homepage && (
-                  <a href={project.homepage} target="_blank" rel="noopener noreferrer">
-                    Visit website <ArrowUpRight size={16} />
-                  </a>
-                )}
-              </div>
-            )}
           </>
         ) : null}
       </dialog>

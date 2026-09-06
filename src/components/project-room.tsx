@@ -157,7 +157,7 @@ export default function ProjectRoom({
         } as React.CSSProperties
       }
     >
-      <header className="room-header">
+      <header className="room-header" inert={station !== null}>
         <button className="room-back" onClick={onExit}>
           <ArrowLeft size={18} />
           <span>Back to island</span>
@@ -172,7 +172,7 @@ export default function ProjectRoom({
         </button>
       </header>
       <div className={'room-layout' + (station ? ' reading' : '')}>
-        <div className="room-world-column">
+        <div className="room-world-column" inert={station !== null}>
           <div
             className="room-world"
             ref={stage}

@@ -157,8 +157,9 @@ export default function PixelRoom(props: RoomSceneProps) {
       aria-label="Pixel project room. Use the station buttons below for keyboard access."
       onClick={(e) => {
         const box = e.currentTarget.getBoundingClientRect();
-        const x = ((e.clientX - box.left) * 640) / box.width,
-          y = ((e.clientY - box.top) * 480) / box.height;
+        const scale = Math.min(box.width / 640, box.height / 480);
+        const x = (e.clientX - box.left - (box.width - 640 * scale) / 2) / scale,
+          y = (e.clientY - box.top - (box.height - 480 * scale) / 2) / scale;
         const i = STATIONS.findIndex((s) => {
           const q = point(s.x, s.y);
           return Math.abs(x - q.x) < s.width * 20 + 8 && y > q.y - 75 && y < q.y + 38;
