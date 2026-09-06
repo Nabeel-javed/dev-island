@@ -1,1 +1,3 @@
-export default function Page() { return <main><h1>Dev Island</h1><p>Your code, a world of its own.</p></main> }
+import IslandApp from '@/components/island-app';
+import {DEMO} from '@/lib/demo';
+export default function Page(){return <IslandApp island={DEMO}/>}
