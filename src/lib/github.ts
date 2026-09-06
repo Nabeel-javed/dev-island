@@ -12,7 +12,7 @@ export class GitHubError extends Error {
 }
 let coolingUntil = 0,
   active = 0;
-async function github(path: string, body?: unknown) {
+export async function github(path: string, body?: unknown) {
   if (Date.now() < coolingUntil)
     throw new GitHubError('GitHub is resting for a moment. Please try again later.', 429);
   if (active >= 12)
@@ -59,6 +59,7 @@ async function github(path: string, body?: unknown) {
   }
 }
 type RestRepo = {
+  owner: { login: string };
   id: number;
   name: string;
   description: string | null;
@@ -74,6 +75,7 @@ type RestRepo = {
 function restRepo(r: RestRepo): Project {
   return {
     id: String(r.id),
+    owner: r.owner.login,
     name: r.name,
     description: r.description ?? '',
     language: r.language ?? '',
@@ -87,6 +89,7 @@ function restRepo(r: RestRepo): Project {
   };
 }
 type GraphRepo = {
+  owner: { login: string };
   id: string;
   name: string;
   description: string | null;
@@ -100,10 +103,11 @@ type GraphRepo = {
   isPrivate: boolean;
 };
 const fields =
-  'id name description primaryLanguage { name } stargazerCount url homepageUrl updatedAt isFork isArchived isPrivate';
+  'id owner { login } name description primaryLanguage { name } stargazerCount url homepageUrl updatedAt isFork isArchived isPrivate';
 function graphRepo(r: GraphRepo): Project {
   return {
     id: r.id,
+    owner: r.owner.login,
     name: r.name,
     description: r.description ?? '',
     language: r.primaryLanguage?.name ?? '',
@@ -217,7 +221,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   store = {
     async get(key) {
       try {
-        return await redis.get<CachedIsland>('island:v1:' + key);
+        return await redis.get<CachedIsland>('island:v2:' + key);
       } catch {
         return memory.get(key);
       }
@@ -225,7 +229,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
     async set(key, value) {
       await memory.set(key, value);
       try {
-        await redis.set('island:v1:' + key, value, { ex: 604800 });
+        await redis.set('island:v2:' + key, value, { ex: 604800 });
       } catch {
         console.warn(JSON.stringify({ event: 'cache_unavailable' }));
       }

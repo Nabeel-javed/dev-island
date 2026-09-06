@@ -27,6 +27,7 @@ export const DEMO: Island = {
   followers: 248,
   projects: names.map((name, i) => ({
     id: name,
+    owner: 'demo',
     name,
     description: descriptions[i],
     language: ['TypeScript', 'JavaScript', 'TypeScript', 'Python', 'TypeScript', 'Shell'][i],

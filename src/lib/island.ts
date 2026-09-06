@@ -2,6 +2,7 @@ export type PaletteId = 'lagoon' | 'sunset' | 'lavender';
 export type StyleId = 'pixel' | '3d';
 export type AvatarId = 'explorer' | 'gardener' | 'sailor' | 'astronaut';
 export type Project = {
+  owner: string;
   id: string;
   name: string;
   description: string;
