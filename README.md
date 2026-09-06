@@ -2,9 +2,21 @@
 
 **Your code, a world of its own.** A playable GitHub portfolio, with a cozy pixel village and a miniature 3D island to compare.
 
+## Live deployment
+
+**https://dev-island-ashen.vercel.app** — Vercel project `dev-island` in `nabeeljavaids-projects`. The GitHub repository remains private. Both rendering styles and project rooms are deployed.
+
+The initial deployment uses public REST data and the in-memory cache. A dedicated GitHub token and shared Redis are not configured yet, so pinned projects and contribution gardens remain unavailable for real profiles. This does not affect the fictional sample or public repository details.
+
+Vercel uses Node 22, the pinned pnpm version, and `vercel.json`. Social metadata automatically uses Vercel’s production domain; `SITE_URL` can override it. Deployments currently run through the CLI, independently of GitHub pushes:
+
+```sh
+pnpm dlx vercel deploy --prod --scope nabeeljavaids-projects
+```
+
 ## Run locally
 
-Requires Node.js 22+ and pnpm 10.33.0.
+Requires Node.js 22.x and pnpm 10.33.0.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -89,6 +101,6 @@ CI runs these checks on pushes to `main` and pull requests. See [validation note
 
 Both visual previews are implemented. The next product decision is choosing the preferred style for the public release; both remain available for comparison. The repository is private during development.
 
-Before public launch: select the style; configure a public-data GitHub token, shared cache and `SITE_URL`; verify GraphQL and Redis with those credentials; add deployment-level distributed rate limits and a spending cap; check Safari and real mobile hardware; then deploy the Next.js project to Vercel and record the launch demo. No cloud services or paid plans are created by the application.
+Remaining rollout work: decide whether to retain both styles; configure a public-data GitHub token, shared cache and `SITE_URL`; verify GraphQL and Redis with those credentials; add deployment-level distributed rate limits and a spending cap; check Safari and real mobile hardware; then record the launch demo. No cloud services or paid plans are created by the application.
 
 Accounts, multiplayer, editors, payments and leaderboards are outside this version. See [asset credits](docs/ASSETS.md). Code and original artwork are MIT licensed.

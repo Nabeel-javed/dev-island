@@ -39,3 +39,9 @@ The room experience replaces the original small project dialog described above; 
 - Formatting, TypeScript, production build, and GitHub CI are required for this milestone.
 
 Real touch hardware, Safari, forced graphics failure, and live authenticated/Redis integrations remain unverified. Automated failure cases use injected responses. Browser checks used native Brave controls because the in-app browser connector could not initialize. Existing browser extensions and upstream Three.js deprecations produced warnings; no browser security settings were changed.
+
+## Initial Vercel deployment — 7 September 2026
+
+Production domain: https://dev-island-ashen.vercel.app. The Vercel cloud build succeeded on Node 22. Anonymous HTTP checks returned 200 for the homepage, a direct room URL, the sample project API, live `octocat/Hello-World` details, and the PNG social-card endpoint. The homepage’s OG-image URL uses the production domain. The deployed 3D room rendered successfully in Brave without a Vercel login prompt.
+
+The initial deployment uses the existing no-token GitHub REST mode and per-instance memory caches. GitHub pushes remain separate from production deployment. The repository is private.
