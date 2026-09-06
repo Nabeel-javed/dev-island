@@ -3,7 +3,7 @@ import {Canvas,useFrame,useThree} from '@react-three/fiber';
 import {Html} from '@react-three/drei';
 import {useEffect,useMemo,useRef} from 'react';
 import * as THREE from 'three';
-import {AVATARS,PALETTES,PLOTS,TREES,seed} from '@/lib/island';
+import {AVATARS,PALETTES,PLOTS,TREES,seed,type Day} from '@/lib/island';
 import type {SceneProps} from './pixel-island';
 const V=(x:number,y:number,z:number):[number,number,number]=>[x,y,z];
 function Box({position,size,color,...rest}:{position:[number,number,number];size:[number,number,number];color:string;rotation?:[number,number,number]}) {return <mesh position={position} {...rest} castShadow receiveShadow><boxGeometry args={size}/><meshStandardMaterial color={color} roughness={.85}/></mesh>}
@@ -37,6 +37,11 @@ function Explorer({props}:{props:SceneProps}){const body=useRef<THREE.Group>(nul
  </group>}
 function FitCamera(){const {camera,size}=useThree();useEffect(()=>{if(camera instanceof THREE.OrthographicCamera){camera.zoom=Math.min(size.width/25.5,size.height/22);camera.lookAt(0,0,1);camera.updateProjectionMatrix();}},[camera,size]);return null;}
 function Boat({motion}:{motion:boolean}){const ref=useRef<THREE.Group>(null);useFrame(({clock})=>{if(ref.current&&motion){ref.current.position.y=-.5+Math.sin(clock.elapsedTime)*.05;ref.current.rotation.z=Math.sin(clock.elapsedTime*.7)*.04;}});return <group ref={ref} position={[1.5,-.5,7.9]}><mesh scale={[.4,.24,.85]} castShadow><sphereGeometry args={[1,8,6]}/><meshStandardMaterial color="#a38258"/></mesh><Box position={[0,.15,0]} size={[.55,.1,1.1]} color="#eddbad"/><Box position={[0,.85,0]} size={[.045,1.4,.045]} color="#886e4e"/><mesh position={[.26,1,0]}><planeGeometry args={[.5,.7]}/><meshStandardMaterial color="#fff3d6" side={THREE.DoubleSide}/></mesh></group>}
+function Garden({days}:{days:Day[]}){
+ const mesh=useRef<THREE.InstancedMesh>(null);
+ useEffect(()=>{if(!mesh.current)return;const transform=new THREE.Object3D(),color=new THREE.Color();days.slice(-371).forEach((d,i)=>{const height=.07+Math.min(d.count,12)*.022;transform.position.set(1.83+Math.floor(i/7)*.064,.295+height/2,4.05+i%7*.18);transform.scale.set(.05,height,.13);transform.updateMatrix();mesh.current!.setMatrixAt(i,transform.matrix);color.set(d.count===0?'#c0b28c':d.count<4?'#a0b979':d.count<8?'#6e985c':'#3f7453');mesh.current!.setColorAt(i,color);});mesh.current.instanceMatrix.needsUpdate=true;if(mesh.current.instanceColor)mesh.current.instanceColor.needsUpdate=true;mesh.current.computeBoundingSphere();},[days]);
+ return <instancedMesh ref={mesh} args={[undefined,undefined,Math.min(days.length,371)]} castShadow receiveShadow><boxGeometry args={[1,1,1]}/><meshStandardMaterial roughness={.9}/></instancedMesh>;
+}
 function World(props:SceneProps){const p=PALETTES[props.palette];const ready=useRef(false);useFrame(()=>{if(!ready.current){ready.current=true;props.onReady();}});useEffect(()=>()=>{document.body.style.cursor='';},[]);
  return <><color attach="background" args={[p.water]}/><fog attach="fog" args={[p.water,40,85]}/><ambientLight intensity={1.3}/><hemisphereLight args={['#fff5dd','#a0bba5',1.8]}/><directionalLight position={[-9,18,10]} intensity={2.5} color="#fff1cf" castShadow shadow-mapSize={[1024,1024]} shadow-camera-left={-15} shadow-camera-right={15} shadow-camera-top={15} shadow-camera-bottom={-15} shadow-normalBias={.04}/><FitCamera/>
  <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.6,0]} receiveShadow><planeGeometry args={[200,200]}/><meshStandardMaterial color={p.water} roughness={.8}/></mesh>
@@ -54,7 +59,7 @@ function World(props:SceneProps){const p=PALETTES[props.palette];const ready=use
  <Box position={[-1.6,.7,5.8]} size={[.07,1,.07]} color="#8d7454"/><Box position={[-1.6,1.1,5.8]} size={[1.3,.5,.09]} color="#e8d6aa"/>
  <Html position={[-1.6,1.15,5.85]} center zIndexRange={[14,0]}><span className="welcome-sign">WELCOME</span></Html>
  <Box position={[3.5,.27,4.65]} size={[3.6,.07,1.5]} color="#a88b60"/>
- {props.island.contributions.slice(-371).map((d,i)=><Box key={d.date} position={[1.83+Math.floor(i/7)*.064,.33+(d.count?Math.min(d.count,12)*.011:0),4.05+i%7*.18]} size={[.05,.07+(d.count?Math.min(d.count,12)*.022:0),.13]} color={d.count===0?'#c0b28c':d.count<4?'#a0b979':d.count<8?'#6e985c':'#3f7453'}/>)}
+ {props.island.contributions.length>0&&<Garden days={props.island.contributions}/>}
  <Html position={[3.5,.5,5.6]} center zIndexRange={[14,0]}><span className="garden-label">CONTRIBUTION GARDEN</span></Html>
  <Box position={[-3.4,.27,4.5]} size={[1.6,.035,1.1]} color="#dfbfa1"/><Box position={[-3.4,.3,4.5]} size={[.4,.06,.32]} color="#f5edcf"/>
  {Array.from({length:30},(_,i)=>{const x=(seed('flowerx'+i)%160-80)/10,z=(seed('flowerz'+i)%100-50)/10;if(Math.abs(x)<1.5||PLOTS.some(p=>Math.abs(p.x-x)<1.6&&Math.abs(p.y-z)<1.8))return null;return <group key={'fl'+i} position={[x,.27,z]}><Box position={[0,.12,0]} size={[.035,.24,.035]} color="#6b8852"/><mesh position={[0,.27,0]}><icosahedronGeometry args={[.1,0]}/><meshStandardMaterial color={i%2?'#f2d28b':'#eedfcf'}/></mesh></group>;})}
