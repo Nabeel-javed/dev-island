@@ -78,3 +78,14 @@ test('project cache coalesces, serves stale on outage, expires and invalidates u
   await assert.rejects(cached('owner/repo'));
   assert.equal(await store.get('owner/repo'), null);
 });
+
+test('root-relative README images resolve inside the repository', () => {
+  assert.equal(
+    resolveReadmeUrl('/docs/image.png', base, true),
+    'https://raw.githubusercontent.com/person/repo/main/docs/image.png',
+  );
+  assert.equal(
+    resolveReadmeUrl('//example.com/image.png', base, true),
+    'https://example.com/image.png',
+  );
+});

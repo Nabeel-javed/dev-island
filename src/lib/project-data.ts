@@ -11,15 +11,18 @@ import {
   type ProjectSnapshot,
 } from './project-cache';
 
-async function fetchProject(key: string): Promise<ProjectDetails> {
+export async function fetchPublicProject(
+  key: string,
+  request: typeof github = github,
+): Promise<ProjectDetails> {
   const [owner, name] = key.split('/');
   const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}`;
-  const repo = await github(path);
+  const repo = await request(path);
   if (repo.private || repo.visibility === 'private' || repo.visibility === 'internal')
     throw new GitHubError('This public project is unavailable.', 404);
   const [readme, languages] = await Promise.allSettled([
-    github(path + '/readme'),
-    github(path + '/languages'),
+    request(path + '/readme'),
+    request(path + '/languages'),
   ]);
   let content: ProjectDetails['readme'] = {
     status: 'missing',
@@ -92,7 +95,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
     },
   };
 }
-const cached = createProjectCache(store, fetchProject);
+const cached = createProjectCache(store, fetchPublicProject);
 export async function getProject(owner: string, name: string): Promise<ProjectDetails> {
   if (!validUsername(owner) || !validRepository(name))
     throw new GitHubError('Enter a valid repository owner and name.', 400);

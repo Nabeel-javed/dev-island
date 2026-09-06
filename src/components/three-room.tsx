@@ -203,9 +203,7 @@ export default function ThreeRoom(props: RoomSceneProps) {
       camera={{ position: [11, 14, 18], near: 0.1, far: 100 }}
       dpr={[1, 1.5]}
       fallback={
-        <p className="room-graphics-note">
-          3D is unavailable. Explore using the station buttons below.
-        </p>
+        <p className="room-graphics-note">Explore this project using the station buttons below.</p>
       }
     >
       <Room {...props} />

@@ -15,6 +15,13 @@ export function resolveReadmeUrl(value: string, base: string, image = false) {
   try {
     if (!image && value.startsWith('#'))
       return '#user-content-' + value.slice(1).replace(/^user-content-/, '');
+    // GitHub treats a leading slash as relative to the repository root.
+    if (value.startsWith('/') && !value.startsWith('//')) {
+      const source = new URL(base);
+      const root = source.pathname.split('/').slice(0, 5).join('/');
+      if (source.hostname === 'github.com' && source.pathname.split('/')[3] === 'blob')
+        value = root + value;
+    }
     const url = new URL(value, base);
     if (url.protocol !== 'https:' || url.username || url.password) return undefined;
     if (image && url.hostname === 'github.com') {
