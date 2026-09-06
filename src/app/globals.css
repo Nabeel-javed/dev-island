@@ -1367,6 +1367,10 @@ footer button {
 /* Project rooms */
 .project-room {
   --room-accent: #205c50;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   position: fixed;
   inset: 0;
   z-index: 100;
