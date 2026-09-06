@@ -11,7 +11,23 @@ export type Controller = {
   step: (dt: number) => void;
   keys: Set<string>;
 };
-export function useController(count: number, onSelect: (index: number) => void, paused: boolean) {
+export type MovementDomain = {
+  advance: (
+    p: { x: number; y: number },
+    dx: number,
+    dy: number,
+    dt: number,
+  ) => { x: number; y: number };
+  nearest: (p: { x: number; y: number }) => number;
+};
+export function useController(
+  count: number,
+  onSelect: (index: number) => void,
+  paused: boolean,
+  domain?: MovementDomain,
+) {
+  const domainRef = useRef(domain);
+  domainRef.current = domain;
   const callback = useRef(onSelect);
   callback.current = onSelect;
   const controller = useRef<Controller>({
@@ -37,7 +53,9 @@ export function useController(count: number, onSelect: (index: number) => void, 
     const dy =
       Number(c.keys.has('s') || c.keys.has('arrowdown')) -
       Number(c.keys.has('w') || c.keys.has('arrowup'));
-    const p = advance(c, dx, dy, dt, count);
+    const p = domainRef.current
+      ? domainRef.current.advance(c, dx, dy, dt)
+      : advance(c, dx, dy, dt, count);
     c.moving = p.x !== c.x || p.y !== c.y;
     if (c.moving) {
       c.dx = dx;
@@ -49,9 +67,15 @@ export function useController(count: number, onSelect: (index: number) => void, 
   useEffect(() => {
     const c = controller.current;
     const down = (e: KeyboardEvent) => {
+      if (c.paused || e.defaultPrevented) return;
       if (
         e.target instanceof HTMLElement &&
-        (e.target.closest('input,textarea,select,dialog') || e.metaKey || e.ctrlKey || e.altKey)
+        (e.target.closest(
+          'input,textarea,select,dialog,[role=dialog],[contenteditable],button,a',
+        ) ||
+          e.metaKey ||
+          e.ctrlKey ||
+          e.altKey)
       )
         return;
       const k = e.key.toLowerCase();
@@ -67,9 +91,9 @@ export function useController(count: number, onSelect: (index: number) => void, 
         !(e.target instanceof HTMLElement && e.target.closest('button,a,[contenteditable]'))
       ) {
         e.preventDefault();
-        const i = PLOTS.slice(0, count).findIndex(
-          (p) => Math.hypot(p.x - c.x, p.y + 1 - c.y) < 2.2,
-        );
+        const i = domainRef.current
+          ? domainRef.current.nearest(c)
+          : PLOTS.slice(0, count).findIndex((p) => Math.hypot(p.x - c.x, p.y + 1 - c.y) < 2.2);
         if (i >= 0) callback.current(i);
       }
     };
