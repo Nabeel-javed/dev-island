@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {advance,canWalk,readAppearance,safeHomepage,seed,selectProjects,validUsername} from '../src/lib/island';
+import {DEMO} from '../src/lib/demo';
+test('pinned ordering is preserved, private repos excluded and fallbacks deduplicated',()=>{const [a,b,c]=DEMO.projects;assert.deepEqual(selectProjects([b,{...c,private:true}],[a,b,c]).map(p=>p.id),[b.id,a.id,c.id]);});
+test('fallback skips forks and archives, tie breaks deterministically',()=>{const [a,b,c]=DEMO.projects;assert.deepEqual(selectProjects([],[{...a,fork:true},{...b,archived:true},c]).map(p=>p.id),[c.id]);});
+test('empty profile remains supported',()=>assert.deepEqual(selectProjects([],[]),[]));
+test('seed and appearance are stable and unknown presets fall back',()=>{assert.equal(seed('demo'),seed('demo'));assert.deepEqual(readAppearance(new URLSearchParams('style=evil&avatar=bad&palette=no')), {style:'pixel',avatar:'explorer',palette:'lagoon'});assert.equal(readAppearance(new URLSearchParams('style=3d&palette=sunset')).palette,'sunset');});
+test('validates usernames and external project URLs',()=>{assert.ok(validUsername('Nabeel-javed'));for(const n of ['a/b','-name','name-','a--b','', 'a'.repeat(40)])assert.ok(!validUsername(n));assert.equal(safeHomepage('javascript:alert(1)'),undefined);assert.equal(safeHomepage('https://user:password@example.org'),undefined);assert.equal(safeHomepage('https://example.org'),'https://example.org/');});
+test('movement remains on land, has collision and frame-rate independent direction',()=>{assert.ok(!canWalk(20,20));assert.ok(!canWalk(-5,-3));assert.ok(canWalk(0,8));const p=advance({x:0,y:6.1},0,1,100);assert.ok(p.y<=6.28+1e-9);const d=advance({x:0,y:5},1,1,.01);assert.ok(Math.abs(Math.hypot(d.x,d.y-5)-.036)<1e-9);});
