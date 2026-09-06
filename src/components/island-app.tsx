@@ -8,14 +8,14 @@ const Pixel=dynamic(()=>import('./pixel-island'),{ssr:false});
 const Three=dynamic(()=>import('./three-island'),{ssr:false});
 class SceneBoundary extends Component<{children:ReactNode},{failed:boolean}>{state={failed:false};static getDerivedStateFromError(){return {failed:true};}render(){return this.state.failed?<div className="scene-fallback"><Compass size={32}/><h3>This view couldn’t load</h3><p>Try the other style, or explore the projects below.</p></div>:this.props.children;}}
 function Logo(){return <svg viewBox="0 0 40 40" width="36" height="36" fill="none" aria-hidden="true"><rect width="40" height="40" rx="12" fill="#205c50"/><path d="m8 26 12-6 12 6-12 6-12-6Z" fill="#d5c799"/><path d="m9 23 11-6 11 6-11 6-11-6Z" fill="#9cbe87"/><path d="M20 9v13m0-13 8 3-8 3" stroke="#f7ecd0" strokeWidth="2" strokeLinejoin="round"/></svg>}
-export default function IslandApp({island}:{island:Island}){
- const [style,setStyle]=useState<StyleId>('pixel'),[palette,setPalette]=useState<PaletteId>('lagoon'),[avatar,setAvatar]=useState<AvatarId>('explorer');
+export default function IslandApp({island,initialAppearance=readAppearance(new URLSearchParams())}:{island:Island;initialAppearance?:ReturnType<typeof readAppearance>}){
+ const [style,setStyle]=useState<StyleId>(initialAppearance.style),[palette,setPalette]=useState<PaletteId>(initialAppearance.palette),[avatar,setAvatar]=useState<AvatarId>(initialAppearance.avatar);
  const [selected,setSelected]=useState<number|null>(null),[ready,setReady]=useState(false),[reducedMotion,setReducedMotion]=useState(false),[visited,setVisited]=useState<number[]>([]),[toast,setToast]=useState(''),[username,setUsername]=useState(''),[error,setError]=useState(''),[loading,setLoading]=useState(false),[about,setAbout]=useState(false);
  const stage=useRef<HTMLDivElement>(null),dialog=useRef<HTMLDialogElement>(null),timer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const select=useCallback((i:number)=>{setSelected(i);setVisited(v=>v.includes(i)?v:[...v,i]);},[]);
  const controller=useController(island.projects.length,select,selected!==null||about);
  const onReady=useCallback(()=>setReady(true),[]);
- useEffect(()=>{const a=readAppearance(new URLSearchParams(window.location.search));setStyle(a.style);setPalette(a.palette);setAvatar(a.avatar);const q=window.matchMedia('(prefers-reduced-motion: reduce)');setReducedMotion(q.matches);const update=()=>setReducedMotion(q.matches);q.addEventListener('change',update);return()=>{q.removeEventListener('change',update);if(timer.current)clearTimeout(timer.current);};},[]);
+ useEffect(()=>{const q=window.matchMedia('(prefers-reduced-motion: reduce)');setReducedMotion(q.matches);const update=()=>setReducedMotion(q.matches);q.addEventListener('change',update);return()=>{q.removeEventListener('change',update);if(timer.current)clearTimeout(timer.current);};},[]);
  useEffect(()=>{if(selected!==null||about)dialog.current?.showModal();else dialog.current?.close();},[selected,about]);
  const notify=(s:string)=>{setToast(s);if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>setToast(''),3500);};
  function appearance(next:{style?:StyleId;palette?:PaletteId;avatar?:AvatarId}){const s=next.style??style,p=next.palette??palette,a=next.avatar??avatar;if(s!==style)setReady(false);setStyle(s);setPalette(p);setAvatar(a);const url=new URL(window.location.href);url.searchParams.set('style',s);url.searchParams.set('palette',p);url.searchParams.set('avatar',a);window.history.replaceState({},'',url);}

@@ -40,3 +40,5 @@ export function advance(position:{x:number;y:number}, dx:number,dy:number,dt:num
   return {x:canWalk(x,position.y,count)?x:position.x,y:canWalk(canWalk(x,position.y,count)?x:position.x,y,count)?y:position.y};
 }
 export const compact=(n:number)=>Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(n);
+
+export function appearanceFromRecord(record:Record<string,string|string[]|undefined>){const params=new URLSearchParams();for(const key of ['style','palette','avatar']){const value=record[key];if(typeof value==='string')params.set(key,value);}return readAppearance(params);}
