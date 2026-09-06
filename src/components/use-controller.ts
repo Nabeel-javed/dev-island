@@ -59,7 +59,14 @@ export function useController(count: number, onSelect: (index: number) => void, 
         if (!c.paused) e.preventDefault();
         c.keys.add(k);
       }
-      if (k === 'e' && !c.paused) {
+      if (
+        (k === 'e' || k === 'enter') &&
+        !c.paused &&
+        !e.repeat &&
+        !e.defaultPrevented &&
+        !(e.target instanceof HTMLElement && e.target.closest('button,a,[contenteditable]'))
+      ) {
+        e.preventDefault();
         const i = PLOTS.slice(0, count).findIndex(
           (p) => Math.hypot(p.x - c.x, p.y + 1 - c.y) < 2.2,
         );

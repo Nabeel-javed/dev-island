@@ -309,7 +309,7 @@ export default function IslandApp({
                 style={{ background: PALETTES[palette].water }}
                 ref={stage}
                 tabIndex={0}
-                aria-label="Interactive island. Use arrow keys to walk and E to enter a nearby project."
+                aria-label="Interactive island. Use arrow keys to walk and Enter or E to open a nearby project."
               >
                 <div className="world-topline">
                   <span className="live-pill">
@@ -414,7 +414,7 @@ export default function IslandApp({
                   <span>or arrow keys to wander</span>
                 </span>
                 <span>
-                  <kbd>E</kbd> enter a project
+                  <kbd>Enter</kbd> or <kbd>E</kbd> open a nearby project
                 </span>
                 <span className="explore-progress">
                   <span />
