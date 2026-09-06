@@ -37,7 +37,7 @@ export function paintIsland(ctx:CanvasRenderingContext2D,island:Island,palette:P
     for(const wx of [-16,14]){rect(x+wx-4,y-8,9,12,'#b39870');rect(x+wx-3,y-7,7,9,'#6f9795');rect(x+wx,y-7,1,10,'#f7efcc');rect(x+wx-3,y-3,7,1,'#f7efcc');rect(x+wx-5,y+5,11,2,'#9a825c');}
     rect(x-5,y+1,10,20,'#7b7158');rect(x-4,y+2,8,17,'#967f58');rect(x+2,y+11,1,2,'#e8c681');rect(x-7,y+20,14,3,'#c4b38b');
     if(index===2){rect(x-22,y-31,44,3,'#e8ddad');rect(x-15,y-34,3,19,'#d2c794');rect(x+12,y-34,3,19,'#d2c794');}
-    else {rect(x+13,y-45,6,15,'#b6a789');rect(x+12,y-46,8,3,'#d8ca9d');c.globalAlpha=.4;rect(x+14+Math.sin(t+i)*2,y-54-(t*4%8),4,4,'#fff6df');c.globalAlpha=1;}
+    else {rect(x+13,y-45,6,15,'#b6a789');rect(x+12,y-46,8,3,'#d8ca9d');c.globalAlpha=.4;rect(x+14+Math.sin(t+index)*2,y-54-(t*4%8),4,4,'#fff6df');c.globalAlpha=1;}
     rect(x-28,y+29,56,13,'#f8f0d8');rect(x-28,y+41,56,1,'#c1b490');text(project.name.length>16?project.name.slice(0,14)+'…':project.name,x,y+37,5.5);
     rect(x-23,y+15,7,7,'#9c7954');rect(x-25,y+11,11,5,p.tree);rect(x-21,y+9,3,3,'#ecc57c');
   }
