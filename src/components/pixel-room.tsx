@@ -38,7 +38,7 @@ export default function PixelRoom(props: RoomSceneProps) {
       for (let row = 0; row < 14; row++) {
         const y = 128 + row * 18;
         rect(66, y, 508, 1, '#bfa77f');
-        for (let col = 0; col < 7; col++) rect(68 + col * 85 + (row % 2) * 42, y, 1, 18, '#bfa77f');
+        for (let x = 68 + (row % 2) * 42; x < 574; x += 85) rect(x, y, 1, 18, '#bfa77f');
       }
       rect(64, 55, 512, 73, '#ede6d3');
       rect(64, 119, 512, 9, '#a48a65');
