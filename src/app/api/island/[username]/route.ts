@@ -1,3 +1,25 @@
-import {NextResponse} from 'next/server';
-import {getIsland,GitHubError} from '@/lib/github';
-export async function GET(_request:Request,{params}:{params:Promise<{username:string}>}){try{const {username}=await params;return NextResponse.json(await getIsland(username),{headers:{'Cache-Control':'public, max-age=60, s-maxage=300'}});}catch(error){const status=error instanceof GitHubError?error.status:500;console.warn(JSON.stringify({event:'island_failed',status}));return NextResponse.json({error:error instanceof GitHubError?error.message:'This island could not be loaded. Please try again.'},{status,headers:{'Cache-Control':'no-store'}});}}
+import { NextResponse } from 'next/server';
+import { getIsland, GitHubError } from '@/lib/github';
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ username: string }> },
+) {
+  try {
+    const { username } = await params;
+    return NextResponse.json(await getIsland(username), {
+      headers: { 'Cache-Control': 'public, max-age=60, s-maxage=300' },
+    });
+  } catch (error) {
+    const status = error instanceof GitHubError ? error.status : 500;
+    console.warn(JSON.stringify({ event: 'island_failed', status }));
+    return NextResponse.json(
+      {
+        error:
+          error instanceof GitHubError
+            ? error.message
+            : 'This island could not be loaded. Please try again.',
+      },
+      { status, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+}
