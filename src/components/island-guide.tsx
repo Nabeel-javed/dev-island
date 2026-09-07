@@ -71,10 +71,12 @@ export default function IslandGuide({
           I’ll help you discover the projects that live here. Each building has a story, and each
           room earns you a stamp in your exploration passport.
         </p>
-        {island.bio && (
+        {(island.customIntro || island.bio) && (
           <blockquote>
-            <span>FROM THE ISLAND’S PROFILE</span>
-            {island.bio}
+            <span>
+              {island.customIntro ? 'WELCOME · CUSTOM VIEW' : 'FROM THE ISLAND’S PROFILE'}
+            </span>
+            {island.customIntro || island.bio}
           </blockquote>
         )}
         {island.projects.length ? (

@@ -1,11 +1,26 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Download, Play, Square, Video, X } from 'lucide-react';
 import { PALETTES, type Island, type PaletteId, type AvatarId } from '@/lib/island';
 import { recordingType, trailerFrame, TRAILER_SECONDS } from '@/lib/trailer';
 import { useController } from './use-controller';
 const Three = dynamic(() => import('./three-island'), { ssr: false });
+class TrailerBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? (
+      <p className="scene-fallback">
+        The trailer’s 3D graphics couldn’t load. Close this preview and try again.
+      </p>
+    ) : (
+      this.props.children
+    );
+  }
+}
 export default function IslandTrailer({
   island,
   palette,
@@ -181,6 +196,7 @@ export default function IslandTrailer({
           outputURL.current = url;
           setOutput({ url, extension: recorder.mimeType.includes('mp4') ? 'mp4' : 'webm' });
           setMessage('Your trailer is ready. Preview it below, then download.');
+          run.current = null;
         };
         recorder.start(250);
       }
@@ -189,13 +205,16 @@ export default function IslandTrailer({
         if (!current.valid) return;
         try {
           time.current = Math.min((now - began) / 1000, TRAILER_SECONDS);
-          setElapsed(time.current);
+          setElapsed(Math.floor(time.current * 10) / 10);
           draw();
           if (time.current < TRAILER_SECONDS) frameId.current = requestAnimationFrame(tick);
           else {
             setActive(false);
             if (current.recorder?.state === 'recording') current.recorder.stop();
-            else setMessage('Preview finished. Record a video to download it.');
+            else {
+              setMessage('Preview finished. Record a video to download it.');
+              run.current = null;
+            }
             // Keep the run until onstop completes so closing can invalidate it.
           }
         } catch {
@@ -232,16 +251,18 @@ export default function IslandTrailer({
           <span>dev island.</span>
         </div>
         <div className="trailer-scene" ref={scene} inert>
-          <Three
-            island={island}
-            palette={palette}
-            avatar={avatar}
-            reducedMotion={true}
-            controller={controller}
-            onSelect={() => {}}
-            onReady={onReady}
-            cinematic={time}
-          />
+          <TrailerBoundary>
+            <Three
+              island={island}
+              palette={palette}
+              avatar={avatar}
+              reducedMotion={true}
+              controller={controller}
+              onSelect={() => {}}
+              onReady={onReady}
+              cinematic={time}
+            />
+          </TrailerBoundary>
         </div>
         <div className="trailer-caption trailer-caption-bottom">
           <strong>

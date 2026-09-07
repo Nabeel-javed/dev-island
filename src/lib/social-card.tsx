@@ -20,7 +20,8 @@ export function socialCard(username: string, palette: PaletteId = 'lagoon', isla
         <div style={{ fontSize: 25, letterSpacing: -1, color: '#205c50' }}>dev island.</div>
         <div
           style={{
-            fontSize: island && username.length > 16 ? 32 : 61,
+            fontSize:
+              island && username.length > 26 ? 22 : island && username.length > 16 ? 32 : 61,
             lineHeight: 1.05,
             letterSpacing: -2,
             marginTop: 40,
