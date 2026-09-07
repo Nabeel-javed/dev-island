@@ -2592,10 +2592,12 @@ footer button {
   font: inherit;
   font-size: 12px;
 }
-.room-night .room-stage {
+.room-night .room-world {
   background: radial-gradient(ellipse at center, #344e59, #172b40);
 }
-.room-night .room-stage-topline {
+.room-night .room-scene-caption,
+.room-night .room-scene-caption .eyebrow,
+.room-night .room-scene-caption > span:last-child {
   color: #e4e4ce;
 }
 @media (max-width: 600px) {
