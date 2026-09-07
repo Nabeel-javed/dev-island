@@ -1,3 +1,4 @@
+import { paintPixelRoom } from '../src/lib/pixel-room-art';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createCanvas } from '@napi-rs/canvas';
 import { DEMO } from '../src/lib/demo';
@@ -39,3 +40,21 @@ BUILDING_IDS.forEach((kind, i) => {
 });
 writeFileSync('artifacts/room-decorations.png', sheet.toBuffer('image/png'));
 console.log('Rendered day/night pixel islands and room decoration sheet in artifacts/.');
+
+for (const lighting of ['day', 'night'] as const) {
+  const canvas = createCanvas(640, 480);
+  paintPixelRoom(
+    canvas.getContext('2d') as unknown as CanvasRenderingContext2D,
+    {
+      identity: 'demo/moss-ui',
+      building: 'cottage',
+      avatar: 'explorer',
+      palette: 'lagoon',
+      lighting,
+      reducedMotion: false,
+      player: { x: 0, y: 2.9, moving: false },
+    },
+    1200,
+  );
+  writeFileSync(`artifacts/pixel-room-${lighting}.png`, canvas.toBuffer('image/png'));
+}
