@@ -7,6 +7,7 @@ import { AVATARS, PALETTES, PLOTS, TREES, seed, type Day } from '@/lib/island';
 import type { SceneProps as BaseSceneProps } from './pixel-island';
 import { BUILDINGS, buildingFor, scenePalette } from '@/lib/buildings';
 import NightAtmosphere from './night-atmosphere';
+import IslandAtmosphere from './island-atmosphere';
 import { trailerFrame } from '@/lib/trailer';
 type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
 const V = (x: number, y: number, z: number): [number, number, number] => [x, y, z];
@@ -431,13 +432,13 @@ function World(props: SceneProps) {
     <>
       <color attach="background" args={[p.water]} />
       <fog attach="fog" args={[p.water, 40, 85]} />
-      <ambientLight intensity={night ? 0.55 : 1.3} />
+      <ambientLight intensity={night ? 0.45 : 0.65} />
       <hemisphereLight
-        args={[night ? '#a6bce9' : '#fff5dd', night ? '#24444b' : '#a0bba5', night ? 0.8 : 1.8]}
+        args={[night ? '#a6bce9' : '#fff5dd', night ? '#24444b' : '#a0bba5', night ? 0.7 : 1.1]}
       />
       <directionalLight
         position={[-9, 18, 10]}
-        intensity={night ? 0.9 : 2.5}
+        intensity={night ? 1.1 : 3.2}
         color={night ? '#bccff6' : '#fff1cf'}
         castShadow
         shadow-mapSize={[1024, 1024]}
@@ -446,6 +447,8 @@ function World(props: SceneProps) {
         shadow-camera-top={15}
         shadow-camera-bottom={-15}
         shadow-normalBias={0.04}
+        shadow-bias={-0.0001}
+        shadow-radius={3}
       />
       {night && <NightAtmosphere reducedMotion={props.reducedMotion} />}
       <FitCamera
@@ -534,6 +537,7 @@ function World(props: SceneProps) {
           </group>
         );
       })}
+      <IslandAtmosphere island={props.island} reducedMotion={props.reducedMotion} night={night} />
       <Boat motion={!props.reducedMotion} />
       <Explorer props={props} />
     </>
@@ -544,7 +548,7 @@ function GraphicsFallback({ onReady }: { onReady: () => void }) {
   return (
     <div className="scene-fallback">
       <p>3D graphics are unavailable.</p>
-      <p>Choose Pixel island or explore the project list below.</p>
+      <p>Choose Pixel island or open a project from your exploration passport.</p>
     </div>
   );
 }
