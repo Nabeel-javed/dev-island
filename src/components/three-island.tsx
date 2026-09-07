@@ -15,7 +15,7 @@ import SceneLighting, { GraphicsPerformance } from './scene-lighting';
 import { useGraphics, GRAPHICS } from './graphics-settings';
 import CoastalLife from './coastal-life';
 import IslandCamera, { type CameraCommand } from './island-camera';
-import { RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
+import { RotateCcw, RotateCw } from 'lucide-react';
 type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
 const V = (x: number, y: number, z: number): [number, number, number] => [x, y, z];
 function Box({
@@ -586,16 +586,6 @@ export default function ThreeIsland(props: SceneProps) {
             onClick={() => cameraAction('right')}
           >
             <RotateCw size={17} />
-          </button>
-          <button aria-label="Zoom into island" title="Zoom in" onClick={() => cameraAction('in')}>
-            <ZoomIn size={17} />
-          </button>
-          <button
-            aria-label="Zoom out of island"
-            title="Zoom out"
-            onClick={() => cameraAction('out')}
-          >
-            <ZoomOut size={17} />
           </button>
           <button onClick={() => cameraAction('reset')} title="Reset camera">
             Reset

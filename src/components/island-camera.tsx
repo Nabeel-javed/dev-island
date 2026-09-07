@@ -7,7 +7,7 @@ import { fitIslandZoom } from '@/lib/island-camera';
 import { trailerFrame } from '@/lib/trailer';
 import { PLOTS } from '@/lib/island';
 import type { SceneProps } from './pixel-island';
-export type CameraCommand = { action: 'reset' | 'in' | 'out' | 'left' | 'right'; sequence: number };
+export type CameraCommand = { action: 'reset' | 'left' | 'right'; sequence: number };
 export default function IslandCamera({
   cinematic,
   count,
@@ -47,8 +47,6 @@ export default function IslandCamera({
       c.target.set(0, 0, 1);
       camera.zoom = base;
     }
-    if (command.action === 'in') camera.zoom = Math.min(base * 2.8, camera.zoom * 1.2);
-    if (command.action === 'out') camera.zoom = Math.max(base * 0.7, camera.zoom / 1.2);
     if (command.action === 'left' || command.action === 'right') {
       camera.position
         .sub(c.target)
@@ -111,13 +109,11 @@ export default function IslandCamera({
       ref={controls}
       makeDefault
       enablePan={false}
+      enableZoom={false}
       enableDamping={!reducedMotion}
       dampingFactor={0.08}
       minPolarAngle={0.35}
       maxPolarAngle={1.25}
-      minZoom={base * 0.7}
-      maxZoom={base * 2.8}
-      zoomSpeed={0.6}
       rotateSpeed={0.55}
     />
   );
