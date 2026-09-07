@@ -22,10 +22,11 @@ export function paintIsland(
     c.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
   };
   const ellipse = (x: number, y: number, rx: number, ry: number, color: string) => {
-    c.fillStyle = color;
-    c.beginPath();
-    c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
-    c.fill();
+    // Stepped silhouettes keep shadows and light in the same pixel grid as sprites.
+    for (let row = -Math.ceil(ry); row <= ry; row += 2) {
+      const span = Math.sqrt(Math.max(0, 1 - (row * row) / (ry * ry))) * rx;
+      rect(x - Math.round(span), y + row, Math.round(span) * 2, 2, color);
+    }
   };
   const text = (s: string, x: number, y: number, size = 6, color = '#4b5747') => {
     c.font = `${size}px monospace`;
@@ -49,9 +50,19 @@ export function paintIsland(
     if (i % 3 === 0) rect(x + 3, y + 3, 6, 1, p.deep);
   }
   c.globalAlpha = 1;
+  // Long, broken swells follow the coast without forming perfect rings.
+  for (let i = 0; i < 34; i++) {
+    const angle = i * 2.399;
+    const swell = Math.sin(t * 0.65 + i * 0.8) * 3;
+    const x = 300 + Math.cos(angle) * (258 + swell);
+    const y = 175 + Math.sin(angle) * (155 + swell);
+    rect(x - 5, y, 10 + (i % 3) * 3, 2, night ? '#749caa30' : '#e7f3df70');
+    rect(x + 2, y + 2, 5, 1, night ? '#749caa20' : '#e7f3df40');
+  }
   coast(256, 154, 5, p.deep);
   coast(250, 148, 0, '#d4e5d1');
   coast(237, 140, 0, '#efe0b3');
+  coast(225, 127, 0, '#9e9666');
   coast(223, 126, -4, '#718e5c');
   coast(223, 126, -9, p.grass);
   coast(214, 117, -12, p.light);
@@ -74,6 +85,13 @@ export function paintIsland(
       y = 86 + (seed('pathy' + i) % 228);
     rect(x, y, 2, 1, '#cfbc91');
   }
+  // Low stone borders give paths a raised edge without blocking movement.
+  for (const y of [179, 261])
+    for (let x = 165; x < 440; x += 13) {
+      if (Math.abs(x - 300) < 20) continue;
+      rect(x, y, 9, 3, '#a69e77');
+      rect(x, y, 8, 1, '#eee0b6');
+    }
   // Small wooden jetty, mooring posts and a boat.
   rect(282, 292, 36, 69, '#775d45');
   rect(285, 292, 30, 67, '#b18c5d');
@@ -165,10 +183,17 @@ export function paintIsland(
     const kind = buildingFor(project),
       theme = BUILDINGS[kind];
     const roof = theme.roof;
-    ellipse(x + 5, y + 20, 32, 7, '#829d70');
+    ellipse(x + 10, y + 23, 37, 9, '#344e362a');
+    rect(x - 27, y + 18, 55, 6, '#9d926f');
+    rect(x - 26, y + 18, 53, 2, '#e1d5af');
     rect(x - 25, y - 16, 50, 37, '#c9b589');
     rect(x - 23, y - 17, 43, 36, theme.wall);
-    rect(x + 20, y - 17, 5, 38, '#d1c099');
+    rect(x + 20, y - 17, 5, 38, '#b3a17e');
+    rect(x - 23, y - 13, 43, 4, '#60564120');
+    for (let row = 0; row < 4; row++) {
+      rect(x - 22, y - 4 + row * 6, 7, 1, '#9e92772b');
+      rect(x + 6 + (row % 2) * 4, y - 3 + row * 6, 8, 1, '#9e92772b');
+    }
     if (kind === 'observatory') {
       rect(x - 26, y - 30, 52, 13, roof);
       rect(x - 21, y - 38, 42, 8, roof);
@@ -191,7 +216,10 @@ export function paintIsland(
     rect(x - 26, y - 17, 52, 2, roof);
     for (const wx of [-16, 14]) {
       rect(x + wx - 4, y - 8, 9, 12, '#b39870');
-      rect(x + wx - 3, y - 7, 7, 9, '#6f9795');
+      rect(x + wx - 3, y - 7, 7, 9, '#527c83');
+      rect(x + wx - 3, y - 7, 3, 4, '#a8ced0');
+      rect(x + wx - 7, y - 8, 2, 12, theme.accent);
+      rect(x + wx + 6, y - 8, 2, 12, theme.accent);
       rect(x + wx, y - 7, 1, 10, '#f7efcc');
       rect(x + wx - 3, y - 3, 7, 1, '#f7efcc');
       rect(x + wx - 5, y + 5, 11, 2, '#9a825c');
@@ -274,6 +302,16 @@ export function paintIsland(
   text('WELCOME', 258, 290, 4.5);
   rect(327, 292, 2, 25, '#80765b');
   rect(329, 292, 13, 8, p.roof);
+  // A pair of butterflies loops around the picnic flowers.
+  if (!night)
+    for (let i = 0; i < 2; i++) {
+      const x = 214 + Math.sin(t * 0.55 + i * 3) * 22;
+      const y = 267 + Math.cos(t * 0.85 + i) * 8;
+      const wing = 1 + Math.round((Math.sin(t * 9 + i) + 1) / 2);
+      rect(x - wing, y, wing, 2, i ? '#e9bd70' : '#e7a593');
+      rect(x + 1, y, wing, 2, i ? '#e9bd70' : '#e7a593');
+      rect(x, y, 1, 3, '#6c7053');
+    }
   // Passing gulls and a compass in the sea.
   for (let i = 0; i < 3; i++) {
     const x = 75 + i * 15 + Math.sin(t * 0.1) * 10,
