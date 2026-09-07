@@ -238,6 +238,7 @@ export default function ProjectRoom({
                     />
                   ) : (
                     <ThreeRoom
+                      exhibit={details ?? undefined}
                       identity={`${project.owner}/${project.name}`}
                       palette={palette}
                       lighting={lighting}

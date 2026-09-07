@@ -1,4 +1,5 @@
 'use client';
+import TechnologyScreen from './technology-screen';
 import SceneLighting, { GraphicsPerformance } from './scene-lighting';
 import { useGraphics, GRAPHICS } from './graphics-settings';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
@@ -301,14 +302,7 @@ function Room(props: RoomSceneProps & CameraProps) {
                 color={i === 2 ? '#203e36' : colors.water}
               />
               {i === 2 ? (
-                [0, 1, 2].map((j) => (
-                  <Box
-                    key={j}
-                    at={[-0.1, 1.98 - j * 0.2, -0.1]}
-                    size={[0.9 - j * 0.15, 0.035, 0.02]}
-                    color={j % 2 ? '#e2c382' : '#9ac190'}
-                  />
-                ))
+                <TechnologyScreen exhibit={props.exhibit} />
               ) : (
                 <Box at={[0, 1.75, -0.09]} size={[0.8, 0.4, 0.025]} color="#f7e9c8" />
               )}
