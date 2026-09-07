@@ -28,6 +28,9 @@ export type Island = {
   source: 'demo' | 'github';
   updatedAt: string;
   notice?: string;
+  customView?: boolean;
+  customIntro?: string;
+  defaultProjects?: Project[];
 };
 export const PALETTES = {
   lagoon: {

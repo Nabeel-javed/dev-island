@@ -2467,3 +2467,83 @@ footer button {
   border-radius: 12px;
   background: #b6d8d4;
 }
+.editor-buildings {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.editor-buildings li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d6dfcc;
+  background: #f5f6ec;
+  border-radius: 9px;
+  padding: 10px;
+}
+.editor-number {
+  font: 12px monospace;
+  color: #889779;
+}
+.editor-buildings li > div {
+  flex: 1;
+  min-width: 0;
+}
+.editor-buildings strong,
+.editor-buildings small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editor-buildings strong {
+  font-size: 13px;
+}
+.editor-buildings small {
+  font-size: 10px;
+  color: #76886b;
+  margin-top: 4px;
+}
+.editor-buildings button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 34px;
+  background: #fffef7;
+  border: 1px solid #ced8c5;
+  border-radius: 5px;
+  color: #45674e;
+}
+.editor-candidates .studio-secondary {
+  margin: 0 6px 6px 0;
+  padding: 8px;
+}
+.editor-add {
+  display: flex;
+  gap: 8px;
+}
+.editor-add input {
+  flex: 1;
+  min-width: 0;
+}
+.editor-add button {
+  flex-shrink: 0;
+}
+.custom-welcome {
+  margin: 12px 0;
+  padding: 14px;
+  background: #eff2e3;
+  border-left: 2px solid #92aa7c;
+  grid-column: 1 / -1;
+}
+.custom-welcome .eyebrow {
+  font-size: 8px;
+}
+.custom-welcome p {
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}

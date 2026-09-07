@@ -1,3 +1,5 @@
+import { getCustomIsland } from '@/lib/custom-island';
+import { recordParams } from '@/lib/customization';
 import { appearanceFromRecord } from '@/lib/island';
 import type { Metadata } from 'next';
 import IslandApp from '@/components/island-app';
@@ -27,11 +29,12 @@ export default async function Page({
 }) {
   const { username } = await params;
   try {
+    const query = await searchParams;
     return (
       <IslandApp
         key={username}
-        island={await getIsland(username)}
-        initialAppearance={appearanceFromRecord(await searchParams)}
+        island={await getCustomIsland(await getIsland(username), recordParams(query))}
+        initialAppearance={appearanceFromRecord(query)}
       />
     );
   } catch (error) {

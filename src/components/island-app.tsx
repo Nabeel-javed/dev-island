@@ -35,6 +35,7 @@ import { usePassport } from './use-passport';
 import IslandGuide from './island-guide';
 import ExplorerPassport from './explorer-passport';
 import { projectKey } from '@/lib/project';
+const IslandEditor = dynamic(() => import('./island-editor'), { ssr: false });
 const IslandTrailer = dynamic(() => import('./island-trailer'), { ssr: false });
 const ProfileCard = dynamic(() => import('./profile-card'), { ssr: false });
 const ProjectRoom = dynamic(() => import('./project-room'), { ssr: false });
@@ -83,6 +84,7 @@ export default function IslandApp({
     [guideOpen, setGuideOpen] = useState(false),
     [cardOpen, setCardOpen] = useState(false),
     [trailerOpen, setTrailerOpen] = useState(false),
+    [editorOpen, setEditorOpen] = useState(false),
     [tourStep, setTourStep] = useState<number | null>(null),
     [toast, setToast] = useState(''),
     [username, setUsername] = useState(''),
@@ -115,7 +117,7 @@ export default function IslandApp({
   const controller = useController(
     island.projects.length,
     select,
-    selected !== null || about || guideOpen || cardOpen || trailerOpen,
+    selected !== null || about || guideOpen || cardOpen || trailerOpen || editorOpen,
   );
   const onReady = useCallback(() => setReady(true), []);
   const restoreDoorway = useCallback(() => {
@@ -393,7 +395,11 @@ export default function IslandApp({
                 <h2>
                   {island.source === 'demo' ? 'Alex’s' : island.name + '’s'} island{' '}
                   <span className="sample-tag">
-                    {island.source === 'demo' ? 'SAMPLE WORLD' : 'PUBLIC PROFILE'}
+                    {island.customView
+                      ? 'CUSTOM VIEW'
+                      : island.source === 'demo'
+                        ? 'SAMPLE WORLD'
+                        : 'PUBLIC PROFILE'}
                   </span>
                 </h2>
                 <p>
@@ -572,6 +578,12 @@ export default function IslandApp({
                   </span>
                 )}
               </div>
+              {island.customIntro && (
+                <blockquote className="custom-welcome">
+                  <span className="eyebrow">WELCOME · CUSTOM VIEW</span>
+                  <p>{island.customIntro}</p>
+                </blockquote>
+              )}
               <div className="profile-stats">
                 <div>
                   <strong>{island.projects.length}</strong>
@@ -644,6 +656,9 @@ export default function IslandApp({
               </button>
               <button className="studio-secondary" onClick={() => setTrailerOpen(true)}>
                 Make an island trailer
+              </button>
+              <button className="studio-secondary" onClick={() => setEditorOpen(true)}>
+                Arrange island buildings
               </button>
               <p className="passport-note">A little world is better with visitors.</p>
             </aside>
@@ -778,6 +793,7 @@ export default function IslandApp({
           </>
         ) : null}
       </dialog>
+      {editorOpen && <IslandEditor island={island} onClose={() => setEditorOpen(false)} />}
       {trailerOpen && (
         <IslandTrailer
           island={island}
