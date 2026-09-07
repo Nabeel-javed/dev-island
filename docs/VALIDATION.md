@@ -69,3 +69,25 @@ The initial deployment uses the existing no-token GitHub REST mode and per-insta
 - Visually inspected PNGs from the actual pixel painter for all six styles in daylight and night, the shared decoration sheet, and a night README card with six distinct buildings. Generated artifacts are local/ignored, reproducible with `pnpm render:previews`.
 - Retried the native Brave connection before this work. It still failed with “Sky Computer Use native pipe startup failed.” This pass therefore does not establish interactive mobile correctness, 3D visual correctness, or actual trailer encoding/download. Those browser checks remain outstanding from the prior release. Offline pixel/card checks do not substitute for them.
 - Decorations retain the existing room station locations and collision rules. Night animation receives the reduced-motion setting; its runtime behavior still needs a browser check.
+
+### Project peeks, doorway entry and stories — 2026-09-07
+
+Implemented release:
+
+- Buildings expose a project peek with an explicit Enter action. 3D buildings highlight on hover/focus; pixel buildings have a selection outline.
+- Entry follows a walkable path, then opens the 3D door with a short camera move. Skip opens the room immediately. Escape, Cancel, navigation, hidden documents, modal opening and renderer changes cancel the sequence. Reduced-motion mode opens immediately. Tour room-to-room navigation remains direct.
+- Story panels show descriptions, source links, screenshots and explicit README Problem/Role/Results sections. No role or outcome is inferred when absent. Sample claims are fictional fixture content.
+- Movement keys require focus inside a game stage. Island generation uses one router navigation, with a visible cancel link and a retry error page.
+- Invalid personal profiles return 404. Personal and customized sample links retain appearance/project selection in metadata. The unchanged homepage uses the actual 3D capture; personalized images use a deterministic isometric illustration built in code from the island's project styles.
+
+Verification:
+
+- 50 automated tests pass, including all doorway pairs, conservative story extraction, appearance/room metadata and actual day/night PNG encoding at 1200×630. Existing collision, cache, sanitization, custom layout and passport tests pass.
+- TypeScript, formatting and the production build pass. The cloud build succeeded on Node 22.
+- Local HTTP: invalid profiles return 404 to browser and Twitterbot user agents; personal and sample room metadata contain the selected project title and appearance in the image URL.
+- Production HTTP after the first deployment: homepage, Nabeel-javed's personal island, selected sample room, story API and personalized night PNG return 200. Invalid profile returns 404 for browser and Twitterbot requests. Story API includes explicit problem/role/outcome fields. PNG was saved and visually inspected; homepage metadata retains the v3 real-capture JPEG.
+- Runtime PNG verification caught unsupported SVG fragments/text; those were replaced with renderer-supported markup and a PNG regression test was added.
+
+Limits: native Brave automation opened the local and production test URLs but returned a blank screenshot and no page accessibility controls, even after reconnecting and raising the window. This release therefore does **not** establish an interactive browser pass for entrance timing, cancel/skip, mobile layout, keyboard focus, reduced motion or actual trailer recording/playback/download. Earlier browser checks above do not validate these new behaviors. Test those flows on real mobile hardware and Safari as well.
+
+Production still has no configured GitHub token or Upstash credentials. Public REST data and per-process memory caching remain available; authenticated pinned projects/contribution history, distributed caching/throttling and traffic-spike capacity remain unverified deployment work. No credentials, accounts or browser security settings were changed.
