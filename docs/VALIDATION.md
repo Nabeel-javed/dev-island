@@ -45,3 +45,10 @@ Real touch hardware, Safari, forced graphics failure, and live authenticated/Red
 Production domain: https://dev-island-ashen.vercel.app. The Vercel cloud build succeeded on Node 22. Anonymous HTTP checks returned 200 for the homepage, a direct room URL, the sample project API, live `octocat/Hello-World` details, and the PNG social-card endpoint. The homepage’s OG-image URL uses the production domain. The deployed 3D room rendered successfully in Brave without a Vercel login prompt.
 
 The initial deployment uses the existing no-token GitHub REST mode and per-instance memory caches. GitHub pushes remain separate from production deployment. The repository is private.
+
+### Guide and passport — 2026-09-07
+
+- 26 unit tests, TypeScript, formatting and production build passed.
+- Brave native UI: Pip introduction, three-room tour, successive room URLs, Finish tour returns outside, 3/6 stamps survive reload, all six stamps unlock completion reward. Final room checked in Miniature 3D; screenshot confirms room and passport layouts.
+- Souvenir export reached the native Save dialog with the expected passport filename. Save was disabled in automation; disk download was not verified and the dialog was cancelled.
+- Mobile layout rules are implemented; this feature pass did not repeat hardware/mobile or storage-denied browser tests.

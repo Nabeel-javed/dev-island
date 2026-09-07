@@ -104,3 +104,7 @@ Both visual previews are implemented. The next product decision is choosing the 
 Remaining rollout work: decide whether to retain both styles; configure a public-data GitHub token, shared cache and `SITE_URL`; verify GraphQL and Redis with those credentials; add deployment-level distributed rate limits and a spending cap; check Safari and real mobile hardware; then record the launch demo. No cloud services or paid plans are created by the application.
 
 Accounts, multiplayer, editors, payments and leaderboards are outside this version. See [asset credits](docs/ASSETS.md). Code and original artwork are MIT licensed.
+
+### Island guide and exploration passport
+
+Meet Pip on the island to start a self-paced tour of up to three featured rooms. Leave the tour at any time. Every room visit collects a passport stamp, saved per island in your browser. Visit all featured rooms to unlock a downloadable PNG souvenir and a link to create your own island. Progress follows repository identities even if buildings are reordered.
