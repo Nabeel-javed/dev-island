@@ -1,8 +1,29 @@
+import { cache } from 'react';
+import { islandMetadata } from '@/lib/island-metadata';
 import { getCustomIsland } from '@/lib/custom-island';
 import { recordParams } from '@/lib/customization';
 import IslandApp from '@/components/island-app';
 import { DEMO } from '@/lib/demo';
 import { appearanceFromRecord } from '@/lib/island';
+type Query = Record<string, string | string[] | undefined>;
+const load = cache((query: string) => getCustomIsland(DEMO, new URLSearchParams(query)));
+export async function generateMetadata({ searchParams }: { searchParams: Promise<Query> }) {
+  const params = recordParams(await searchParams);
+  if (
+    !['project', 'projects', 'buildings', 'intro', 'palette', 'lighting', 'style', 'avatar'].some(
+      (key) => params.has(key),
+    )
+  )
+    return {};
+  try {
+    return islandMetadata(await load(params.toString()), params);
+  } catch {
+    return {
+      title: 'This custom island could not load — Dev Island',
+      robots: { index: false, follow: false },
+    };
+  }
+}
 export default async function Page({
   searchParams,
 }: {
@@ -12,7 +33,7 @@ export default async function Page({
   try {
     return (
       <IslandApp
-        island={await getCustomIsland(DEMO, recordParams(query))}
+        island={await load(recordParams(query).toString())}
         initialAppearance={appearanceFromRecord(query)}
       />
     );

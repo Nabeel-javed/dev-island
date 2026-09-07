@@ -423,6 +423,12 @@ export default function IslandApp({
                 {loading ? <span className="spinner" /> : <ArrowRight size={20} />}
               </button>
             </form>
+            {loading && (
+              <div className="generation-status" role="status">
+                <span>Finding your public projects…</span>
+                <a href="/#explore">Cancel and explore the sample</a>
+              </div>
+            )}
             <div className="form-note">
               {error ? (
                 <span role="alert" className="form-error">
