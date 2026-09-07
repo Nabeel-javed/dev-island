@@ -8,7 +8,10 @@ import { appearanceFromRecord } from '@/lib/island';
 type Query = Record<string, string | string[] | undefined>;
 const load = cache((query: string) => getCustomIsland(DEMO, new URLSearchParams(query)));
 export async function generateMetadata({ searchParams }: { searchParams: Promise<Query> }) {
-  const params = recordParams(await searchParams);
+  const record = await searchParams;
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(record))
+    if (typeof value === 'string') params.set(key, value);
   if (
     !['project', 'projects', 'buildings', 'intro', 'palette', 'lighting', 'style', 'avatar'].some(
       (key) => params.has(key),
