@@ -118,3 +118,13 @@ Meet Pip on the island to start a self-paced tour of up to three featured rooms.
 - `/api/card?username=...&palette=...&projects=...` provides the README card. The endpoint accepts the same customization parameters as the island page. GitHub caches README images, so project-data updates may not appear immediately.
 
 Browser export APIs: [canvas captureStream](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream), [MediaRecorder format detection](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/isTypeSupported_static).
+
+### Building styles and night mode
+
+Use **Arrange island buildings** to choose Cottage, Café, Observatory, Workshop, Library, or Arcade for each project. Every style has its own exterior, interior materials, and original wall decoration in both Pixel and Miniature 3D. When no style is selected, a stable choice is derived from the repository identity. Reordering buildings keeps their styles and passport stamps.
+
+Use **Time of day → Night** in the island sidebar for warm windows, path lanterns, stars, and fireflies. Daylight is the default. All three palettes have corresponding night colors. Reduced-motion preferences keep decorative movement still; the trailer camera remains an explicit opt-in action.
+
+Sharing preserves `lighting=day|night` and `buildings=owner/repo:style,...`. Building styles are keyed by repository identity, validated against six supported choices, and limited to six entries. README cards show the same building styles/night colors; trailers render the current island settings. Room layouts preserve all four stations and existing movement boundaries; new room decorations are mounted on the wall.
+
+For offline visual checks, run `pnpm render:previews`. This uses the real pixel painter to create day/night PNGs and a shared room-decoration sheet in the ignored `artifacts/` directory. The native canvas package is a development-only dependency.

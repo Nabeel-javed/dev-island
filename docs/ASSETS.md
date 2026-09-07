@@ -9,6 +9,9 @@ All island artwork is original and created in this repository:
 - README cards: authored social-card shapes with public project labels.
 - Trailers: the original 3D island rendered with an authored camera path and text captions; silent, with no external music or footage.
 - Passport souvenirs: original Canvas 2D stamp illustrations.
+- Building variants: authored café awnings, observatory domes/telescopes, workshop roofs, library columns and arcade facades in pixel/3D/card renderers.
+- Interior artwork: original mug, planet chart, tools, book shelves and pixel creature in `src/lib/room-decor.ts`, shared by pixel and 3D rooms.
+- Night atmosphere: original procedural stars, moon, fireflies and lantern geometry.
 - Project rooms: original Canvas 2D furnishings and Three.js primitive models, with deterministic wall art and books.
 - `public/room-sample.svg`: original fictional interface illustration for the sample gallery.
 
