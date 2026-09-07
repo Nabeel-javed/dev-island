@@ -2910,3 +2910,91 @@ footer button {
   color: #405e47;
   text-underline-offset: 3px;
 }
+
+.three-room-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+.room-camera-tools {
+  position: absolute;
+  right: 12px;
+  bottom: 48px;
+  z-index: 13;
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid #d0d8c9;
+  border-radius: 12px;
+  background: #faf9f0ed;
+  box-shadow: 0 4px 18px #29493a12;
+}
+.room-camera-tools button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #405e47;
+  cursor: pointer;
+}
+.room-camera-tools button:hover {
+  background: #e7ecde;
+}
+.room-camera-tools button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.room-camera-tools button:focus-visible {
+  outline: 2px solid #607e63;
+  outline-offset: 1px;
+}
+.room-night .room-camera-tools {
+  background: #263f4aee;
+  border-color: #576e73;
+}
+.room-night .room-camera-tools button {
+  color: #e6e6cf;
+}
+.room-night .room-camera-tools button:hover {
+  background: #395561;
+}
+@media (max-width: 760px) {
+  .room-world {
+    min-height: 430px;
+  }
+  .room-render {
+    inset: 48px 0 98px;
+  }
+  .room-camera-tools {
+    bottom: 0;
+    right: 8px;
+    padding: 3px;
+    gap: 0;
+  }
+  .room-camera-tools button {
+    width: 40px;
+    height: 40px;
+  }
+  .room-touch-controls {
+    grid-template-columns: repeat(3, 40px);
+    grid-template-rows: repeat(2, 40px);
+  }
+  .room-interact > span {
+    max-width: 160px;
+  }
+  .room-scene-caption > span:last-child {
+    max-width: 46%;
+    text-align: right;
+    font-size: 9px;
+  }
+}
+@media (max-height: 600px) and (min-width: 761px) {
+  .room-world {
+    min-height: 330px;
+  }
+}

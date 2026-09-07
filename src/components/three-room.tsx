@@ -1,7 +1,9 @@
 'use client';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ZoomIn, ZoomOut, RotateCcw, MoveHorizontal } from 'lucide-react';
+import { roomCameraFrame, ROOM_FOV } from '@/lib/room-camera';
 import * as THREE from 'three';
 import { BUILDINGS, scenePalette } from '@/lib/buildings';
 import { roomDecor } from '@/lib/room-decor';
@@ -26,18 +28,18 @@ function Box({
     </mesh>
   );
 }
-function Camera() {
+function Camera({ zoom, angle }: { zoom: number; angle: number }) {
   const { camera, size } = useThree();
   useEffect(() => {
-    if (camera instanceof THREE.OrthographicCamera) {
-      camera.zoom = Math.min(size.width / 18, size.height / 15);
-      camera.lookAt(0, 0.2, 0);
-      camera.updateProjectionMatrix();
-    }
-  }, [camera, size]);
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+    const frame = roomCameraFrame(size.width, size.height, zoom, angle);
+    camera.position.set(...frame.position);
+    camera.lookAt(...frame.target);
+    camera.updateProjectionMatrix();
+  }, [camera, size, zoom, angle]);
   return null;
 }
-function Room(props: RoomSceneProps) {
+function Room(props: RoomSceneProps & { zoom: number; angle: number }) {
   const theme = BUILDINGS[props.building],
     night = props.lighting === 'night';
   const colors = {
@@ -47,7 +49,7 @@ function Room(props: RoomSceneProps) {
   };
   return (
     <>
-      <Camera />
+      <Camera zoom={props.zoom} angle={props.angle} />
       <ambientLight intensity={night ? 0.55 : 0.8} />
       <hemisphereLight args={[night ? '#a6bce9' : '#fff3da', '#798b72', 0.65]} />
       <RoomAtmosphere reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
@@ -229,19 +231,57 @@ function Room(props: RoomSceneProps) {
   );
 }
 export default function ThreeRoom(props: RoomSceneProps) {
+  const [zoom, setZoom] = useState(1),
+    [angle, setAngle] = useState(0);
   return (
-    <Canvas
-      orthographic
-      shadows
-      camera={{ position: [11, 14, 18], near: 0.1, far: 100 }}
-      dpr={[1, 1.5]}
-      fallback={
-        <p className="room-graphics-note">
-          3D graphics are unavailable. Return to the island and choose Pixel island.
-        </p>
-      }
-    >
-      <Room {...props} />
-    </Canvas>
+    <div className="three-room-stage">
+      <Canvas
+        shadows
+        camera={{ position: [11, 10, 16], fov: ROOM_FOV, near: 0.1, far: 250 }}
+        dpr={[1, 1.5]}
+        fallback={
+          <p className="room-graphics-note">
+            3D graphics are unavailable. Return to the island and choose Pixel island.
+          </p>
+        }
+      >
+        <Room {...props} zoom={zoom} angle={angle} />
+      </Canvas>
+      <div className="room-camera-tools" role="group" aria-label="Room camera">
+        <button
+          aria-label="Zoom into room"
+          title="Zoom in"
+          disabled={zoom >= 1.5}
+          onClick={() => setZoom((z) => Math.min(1.5, z + 0.15))}
+        >
+          <ZoomIn size={17} />
+        </button>
+        <button
+          aria-label="Zoom out of room"
+          title="Zoom out"
+          disabled={zoom <= 1}
+          onClick={() => setZoom((z) => Math.max(1, z - 0.15))}
+        >
+          <ZoomOut size={17} />
+        </button>
+        <button
+          aria-label="Change room viewing angle"
+          title="Change viewing angle"
+          onClick={() => setAngle((a) => (a === 0 ? -0.2 : a < 0 ? 0.2 : 0))}
+        >
+          <MoveHorizontal size={17} />
+        </button>
+        <button
+          aria-label="Reset room camera"
+          title="Fit whole room"
+          onClick={() => {
+            setZoom(1);
+            setAngle(0);
+          }}
+        >
+          <RotateCcw size={17} />
+        </button>
+      </div>
+    </div>
   );
 }
