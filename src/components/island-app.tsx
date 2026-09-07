@@ -14,8 +14,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  ChevronRight,
-  Code2,
   Compass,
   Download,
   Grid2X2,
@@ -770,53 +768,6 @@ export default function IslandApp({
             </aside>
           </div>
           {island.notice && <p className="data-notice">{island.notice}</p>}
-          <div className="projects-heading">
-            <span>
-              {island.projects.length} places to explore <ChevronRight size={15} />
-            </span>
-          </div>
-          <div className="project-grid">
-            {island.projects.map((p, i) => (
-              <button key={p.id} className="project-card" onClick={() => select(i)}>
-                <div className={'project-symbol symbol-' + i}>
-                  <Code2 size={21} />
-                </div>
-                <div className="project-card-body">
-                  <h3>
-                    {p.name} <ArrowUpRight size={15} />
-                  </h3>
-                  <p>{p.description || 'A project waiting to be discovered.'}</p>
-                  <div className="project-meta">
-                    <span>
-                      <i
-                        style={{
-                          background: [
-                            '#678f9b',
-                            '#d0ab61',
-                            '#88a269',
-                            '#ba8b78',
-                            '#9f8bae',
-                            '#809789',
-                          ][i],
-                        }}
-                      />
-                      {p.language || 'Code'}
-                    </span>
-                    <span>
-                      <Star size={12} />
-                      {compact(p.stars)}
-                    </span>
-                    {visited.includes(i) && (
-                      <span className="visited-label">
-                        <Check size={12} />
-                        Visited
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
           {!island.projects.length && (
             <div className="empty-projects">
               <Leaf />
