@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import type PhaserType from 'phaser';
+import type { LightingId } from '@/lib/buildings';
 import { Island, PaletteId, AvatarId, PLOTS } from '@/lib/island';
 import { H, W, paintIsland, point } from '@/lib/pixel-art';
 import { Controller } from './use-controller';
 export type SceneProps = {
   island: Island;
   palette: PaletteId;
+  lighting?: LightingId;
   avatar: AvatarId;
   controller: React.RefObject<Controller>;
   onSelect: (index: number) => void;
@@ -50,6 +52,7 @@ export default function PixelIsland(props: SceneProps) {
               p.avatar,
               p.controller.current,
               p.reducedMotion ? 0 : time,
+              p.lighting,
             );
             this.texture.refresh();
           }

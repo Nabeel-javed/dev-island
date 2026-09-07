@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
 import { AVATARS, PALETTES, PLOTS, TREES, seed, type Day } from '@/lib/island';
 import type { SceneProps as BaseSceneProps } from './pixel-island';
+import { BUILDINGS, buildingFor, scenePalette } from '@/lib/buildings';
+import NightAtmosphere from './night-atmosphere';
 import { trailerFrame } from '@/lib/trailer';
 type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
 const V = (x: number, y: number, z: number): [number, number, number] => [x, y, z];
@@ -70,14 +72,9 @@ function Tree({
 function House({ index, props }: { index: number; props: SceneProps }) {
   const p = PLOTS[index],
     project = props.island.projects[index];
-  const colors = [
-    PALETTES[props.palette].roof,
-    '#6d9893',
-    '#91a275',
-    '#c2a576',
-    '#a294b1',
-    '#849fa9',
-  ];
+  const kind = buildingFor(project),
+    theme = BUILDINGS[kind],
+    night = props.lighting === 'night';
   const roof = useMemo(() => {
     const shape = new THREE.Shape();
     shape.moveTo(-1.3, 0);
@@ -102,12 +99,25 @@ function House({ index, props }: { index: number; props: SceneProps }) {
       }}
     >
       <Box position={[0, 0.06, 0]} size={[2.65, 0.14, 2.3]} color="#d6c79f" />
-      <Box position={[0, 0.9, 0]} size={[2.2, 1.7, 1.9]} color="#f2e8ce" />
-      <mesh geometry={roof} position={[0, 1.8, -1.125]} castShadow receiveShadow>
-        <meshStandardMaterial color={colors[index]} roughness={0.9} />
-      </mesh>
-      <Box position={[0.68, 2.3, -0.42]} size={[0.27, 0.9, 0.3]} color="#c0ab91" />
-      <Box position={[0.68, 2.78, -0.42]} size={[0.36, 0.12, 0.39]} color="#e3d7bc" />
+      <Box position={[0, 0.9, 0]} size={[2.2, 1.7, 1.9]} color={theme.wall} />
+      {kind === 'observatory' ? (
+        <mesh position={[0, 1.85, 0]}>
+          <sphereGeometry args={[1.3, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial color={theme.roof} metalness={0.3} roughness={0.6} />
+        </mesh>
+      ) : kind === 'arcade' || kind === 'workshop' ? (
+        <Box position={[0, 1.92, 0]} size={[2.6, 0.35, 2.25]} color={theme.roof} />
+      ) : (
+        <mesh geometry={roof} position={[0, 1.8, -1.125]} castShadow receiveShadow>
+          <meshStandardMaterial color={theme.roof} roughness={0.9} />
+        </mesh>
+      )}
+      {(kind === 'cottage' || kind === 'cafe') && (
+        <>
+          <Box position={[0.68, 2.3, -0.42]} size={[0.27, 0.9, 0.3]} color="#c0ab91" />
+          <Box position={[0.68, 2.78, -0.42]} size={[0.36, 0.12, 0.39]} color="#e3d7bc" />
+        </>
+      )}
       <Box position={[0, 0.53, 0.97]} size={[0.44, 1.04, 0.07]} color="#877557" />
       <mesh position={[0.12, 0.52, 1.02]}>
         <sphereGeometry args={[0.035, 6, 6]} />
@@ -115,7 +125,14 @@ function House({ index, props }: { index: number; props: SceneProps }) {
       </mesh>
       {[-0.73, 0.73].map((x) => (
         <group key={x}>
-          <Box position={[x, 1.06, 0.976]} size={[0.5, 0.62, 0.07]} color="#9cb9b4" />
+          <mesh position={[x, 1.06, 0.976]}>
+            <boxGeometry args={[0.5, 0.62, 0.07]} />
+            <meshStandardMaterial
+              color={night ? '#ffd793' : '#9cb9b4'}
+              emissive="#ffd793"
+              emissiveIntensity={night ? 1.4 : 0}
+            />
+          </mesh>
           <Box position={[x, 1.06, 1.02]} size={[0.035, 0.64, 0.04]} color="#f7efd9" />
           <Box position={[x, 1.06, 1.02]} size={[0.52, 0.035, 0.04]} color="#f7efd9" />
           <Box position={[x, 0.71, 1.02]} size={[0.64, 0.08, 0.18]} color="#bca77e" />
@@ -132,7 +149,80 @@ function House({ index, props }: { index: number; props: SceneProps }) {
         <icosahedronGeometry args={[0.25, 1]} />
         <meshStandardMaterial color="#6a9366" />
       </mesh>
-      <Html position={[0, 3.35, 0]} center zIndexRange={[15, 0]}>
+      {kind === 'cafe' && (
+        <group position={[0, 1.48, 1.16]}>
+          {Array.from({ length: 8 }, (_, i) => (
+            <Box
+              key={i}
+              position={[-1.05 + i * 0.3, 0, 0]}
+              size={[0.3, 0.16, 0.65]}
+              color={i % 2 ? '#faecd3' : theme.accent}
+            />
+          ))}
+          <Box position={[0.92, -0.67, 0.25]} size={[0.46, 0.55, 0.06]} color="#684c41" />
+        </group>
+      )}
+      {kind === 'observatory' && (
+        <group position={[0.2, 2.8, 0.2]} rotation={[0, 0, -0.65]}>
+          <mesh>
+            <cylinderGeometry args={[0.16, 0.22, 1.2, 12]} />
+            <meshStandardMaterial color="#d7e3e5" metalness={0.5} roughness={0.4} />
+          </mesh>
+          <mesh position={[0, 0.6, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 0.1, 12]} />
+            <meshStandardMaterial color="#344f6f" />
+          </mesh>
+        </group>
+      )}
+      {kind === 'workshop' && (
+        <>
+          <Box position={[0.68, 0.9, 0.99]} size={[0.65, 1.4, 0.12]} color="#8a7960" />
+          {Array.from({ length: 6 }, (_, i) => (
+            <Box
+              key={i}
+              position={[0.68, 0.3 + i * 0.22, 1.07]}
+              size={[0.62, 0.04, 0.04]}
+              color="#c3b18d"
+            />
+          ))}
+          <Box position={[-0.6, 2.25, 0]} size={[0.65, 0.35, 0.7]} color="#b6b7a0" />
+        </>
+      )}
+      {kind === 'library' && (
+        <>
+          {[-1, 1].map((x) => (
+            <Box key={x} position={[x, 1, 1.1]} size={[0.15, 1.8, 0.22]} color="#f6e8c6" />
+          ))}
+          <Box position={[0, 1.72, 1.13]} size={[2.3, 0.25, 0.22]} color={theme.accent} />
+          {[-0.17, 0.17].map((x) => (
+            <Box key={x} position={[x, 2.24, 1.08]} size={[0.29, 0.4, 0.06]} color="#f4e5bd" />
+          ))}
+        </>
+      )}
+      {kind === 'arcade' && (
+        <>
+          <Box position={[0, 2.26, 0.93]} size={[2.3, 0.5, 0.28]} color="#443553" />
+          {[-1.02, 1.02].map((x, i) => (
+            <mesh key={x} position={[x, 1.15, 1.05]}>
+              <boxGeometry args={[0.09, 1.45, 0.08]} />
+              <meshStandardMaterial
+                color={i ? '#9bd9d4' : '#edb1e7'}
+                emissive={i ? '#66c7bf' : '#db89d6'}
+                emissiveIntensity={night ? 1.5 : 0.4}
+              />
+            </mesh>
+          ))}
+          {[-0.65, -0.32, 0, 0.32, 0.65].map((x, i) => (
+            <Box
+              key={x}
+              position={[x, 2.27 + (i % 2) * 0.06, 1.1]}
+              size={[0.18, 0.22, 0.03]}
+              color="#e6b9e3"
+            />
+          ))}
+        </>
+      )}
+      <Html position={[0, 3.7, 0]} center zIndexRange={[15, 0]}>
         <button className="house-label" onClick={() => props.onSelect(index)}>
           {project.name}
         </button>
@@ -289,7 +379,8 @@ function Garden({ days }: { days: Day[] }) {
   );
 }
 function World(props: SceneProps) {
-  const p = PALETTES[props.palette];
+  const p = scenePalette(props.palette, props.lighting),
+    night = props.lighting === 'night';
   const ready = useRef(false);
   useFrame(() => {
     if (!ready.current) {
@@ -307,12 +398,14 @@ function World(props: SceneProps) {
     <>
       <color attach="background" args={[p.water]} />
       <fog attach="fog" args={[p.water, 40, 85]} />
-      <ambientLight intensity={1.3} />
-      <hemisphereLight args={['#fff5dd', '#a0bba5', 1.8]} />
+      <ambientLight intensity={night ? 0.55 : 1.3} />
+      <hemisphereLight
+        args={[night ? '#a6bce9' : '#fff5dd', night ? '#24444b' : '#a0bba5', night ? 0.8 : 1.8]}
+      />
       <directionalLight
         position={[-9, 18, 10]}
-        intensity={2.5}
-        color="#fff1cf"
+        intensity={night ? 0.9 : 2.5}
+        color={night ? '#bccff6' : '#fff1cf'}
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-15}
@@ -321,6 +414,7 @@ function World(props: SceneProps) {
         shadow-camera-bottom={-15}
         shadow-normalBias={0.04}
       />
+      {night && <NightAtmosphere reducedMotion={props.reducedMotion} />}
       <FitCamera cinematic={props.cinematic} count={props.island.projects.length} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]} receiveShadow>
         <planeGeometry args={[200, 200]} />

@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Download, Play, Square, Video, X } from 'lucide-react';
 import { PALETTES, type Island, type PaletteId, type AvatarId } from '@/lib/island';
+import { scenePalette, type LightingId } from '@/lib/buildings';
 import { recordingType, trailerFrame, TRAILER_SECONDS } from '@/lib/trailer';
 import { useController } from './use-controller';
 const Three = dynamic(() => import('./three-island'), { ssr: false });
@@ -24,11 +25,13 @@ class TrailerBoundary extends Component<{ children: ReactNode }, { failed: boole
 export default function IslandTrailer({
   island,
   palette,
+  lighting = 'day',
   avatar,
   onClose,
 }: {
   island: Island;
   palette: PaletteId;
+  lighting?: LightingId;
   avatar: AvatarId;
   onClose: () => void;
 }) {
@@ -116,7 +119,7 @@ export default function IslandTrailer({
     };
     const draw = () => {
       const shot = trailerFrame(time.current, island.projects.length);
-      c.fillStyle = PALETTES[palette].water;
+      c.fillStyle = scenePalette(palette, lighting).water;
       c.fillRect(0, 0, 1280, 720);
       const scale = Math.min(1280 / source.width, 720 / source.height);
       c.drawImage(
@@ -255,6 +258,7 @@ export default function IslandTrailer({
             <Three
               island={island}
               palette={palette}
+              lighting={lighting}
               avatar={avatar}
               reducedMotion={true}
               controller={controller}

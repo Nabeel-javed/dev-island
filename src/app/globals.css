@@ -2547,3 +2547,69 @@ footer button {
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
+
+.lighting-toggle {
+  display: flex;
+  gap: 5px;
+  margin: 9px 0 18px;
+}
+.lighting-toggle button {
+  flex: 1;
+  padding: 9px 10px;
+  border: 1px solid #cbd5bf;
+  background: #f8f8ee;
+  color: #4f6d57;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+}
+.lighting-toggle button[aria-pressed='true'] {
+  background: #294e49;
+  color: #f8efd6;
+  border-color: #294e49;
+}
+.world-night .coordinate,
+.world-night .world-hint {
+  color: #d5dfd6;
+}
+.world-night .house-label {
+  background: #293e4e;
+  color: #f1e3be;
+  border-color: #70877e;
+}
+.world-night .world-loading {
+  background: #172b40;
+  color: #e9e1c6;
+}
+.editor-building-style select {
+  max-width: 135px;
+  width: 100%;
+  border: 1px solid #cad6c2;
+  background: #fffdf3;
+  color: #3f624b;
+  padding: 8px 6px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+}
+.room-night .room-stage {
+  background: radial-gradient(ellipse at center, #344e59, #172b40);
+}
+.room-night .room-stage-topline {
+  color: #e4e4ce;
+}
+@media (max-width: 600px) {
+  .editor-buildings li {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .editor-buildings li > div {
+    flex-basis: calc(100% - 30px);
+  }
+  .editor-building-style {
+    flex: 1;
+  }
+  .editor-building-style select {
+    max-width: none;
+  }
+}

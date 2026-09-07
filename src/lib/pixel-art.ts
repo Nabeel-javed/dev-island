@@ -1,3 +1,4 @@
+import { BUILDINGS, buildingFor, scenePalette, type LightingId } from './buildings';
 import { AVATARS, AvatarId, Island, PALETTES, PaletteId, PLOTS, TREES, seed } from './island';
 export const W = 600,
   H = 400;
@@ -9,9 +10,11 @@ export function paintIsland(
   avatar: AvatarId,
   player: { x: number; y: number; moving: boolean },
   time: number,
+  lighting: LightingId = 'day',
 ) {
   const c = ctx;
-  const p = PALETTES[palette];
+  const p = scenePalette(palette, lighting);
+  const night = lighting === 'night';
   const t = time / 1000;
   c.imageSmoothingEnabled = false;
   const rect = (x: number, y: number, w: number, h: number, color: string) => {
@@ -159,17 +162,23 @@ export function paintIsland(
     const x = q.x,
       y = q.y;
     const project = island.projects[index];
-    const colors = [p.roof, '#668b86', '#839465', '#bf9b62', '#867b96', '#8a9da3'];
-    const roof = colors[index];
+    const kind = buildingFor(project),
+      theme = BUILDINGS[kind];
+    const roof = theme.roof;
     ellipse(x + 5, y + 20, 32, 7, '#829d70');
     rect(x - 25, y - 16, 50, 37, '#c9b589');
-    rect(x - 23, y - 17, 43, 36, '#f2e7c5');
+    rect(x - 23, y - 17, 43, 36, theme.wall);
     rect(x + 20, y - 17, 5, 38, '#d1c099');
-    if (index === 4) {
+    if (kind === 'observatory') {
       rect(x - 26, y - 30, 52, 13, roof);
       rect(x - 21, y - 38, 42, 8, roof);
       rect(x - 15, y - 43, 30, 5, roof);
       rect(x - 10, y - 46, 20, 3, roof);
+    } else if (kind === 'workshop' || kind === 'arcade') {
+      rect(x - 27, y - 30, 54, 14, roof);
+      rect(x - 24, y - 34, 48, 5, theme.accent);
+      if (kind === 'workshop')
+        for (let j = 0; j < 5; j++) rect(x - 23 + j * 10, y - 33, 2, 14, '#b8c4ab');
     } else {
       for (let i = 0; i < 12; i++) {
         const w = 8 + i * 4.4;
@@ -191,16 +200,39 @@ export function paintIsland(
     rect(x - 4, y + 2, 8, 17, '#967f58');
     rect(x + 2, y + 11, 1, 2, '#e8c681');
     rect(x - 7, y + 20, 14, 3, '#c4b38b');
-    if (index === 2) {
+    if (kind === 'library') {
       rect(x - 22, y - 31, 44, 3, '#e8ddad');
       rect(x - 15, y - 34, 3, 19, '#d2c794');
       rect(x + 12, y - 34, 3, 19, '#d2c794');
-    } else {
+    } else if (kind === 'cottage' || kind === 'cafe') {
       rect(x + 13, y - 45, 6, 15, '#b6a789');
       rect(x + 12, y - 46, 8, 3, '#d8ca9d');
       c.globalAlpha = 0.4;
       rect(x + 14 + Math.sin(t + index) * 2, y - 54 - ((t * 4) % 8), 4, 4, '#fff6df');
       c.globalAlpha = 1;
+    }
+    if (kind === 'cafe') {
+      for (let j = 0; j < 8; j++)
+        rect(x - 28 + j * 7, y - 10, 7, 8, j % 2 ? '#faeed8' : theme.accent);
+      rect(x + 19, y + 5, 13, 11, '#765746');
+      text('CAFE', x + 25, y + 12, 4, '#faeed8');
+    }
+    if (kind === 'observatory') {
+      rect(x + 4, y - 47, 18, 5, '#d6e6ee');
+      rect(x + 18, y - 50, 5, 10, '#9baebe');
+      rect(x - 2, y - 43, 3, 11, '#bacbd5');
+    }
+    if (kind === 'arcade') {
+      rect(x - 22, y - 28, 44, 12, '#45385e');
+      text('PLAY', x, y - 19, 7, '#f1c7e5');
+      rect(x - 24, y - 17, 3, 30, '#cd93cd');
+      rect(x + 22, y - 17, 3, 30, '#84d1cd');
+    }
+    if (kind === 'workshop') {
+      rect(x + 10, y - 13, 13, 27, '#806d56');
+      for (let j = 0; j < 5; j++) rect(x + 11, y - 11 + j * 5, 11, 1, '#bca681');
+      rect(x - 24, y - 27, 12, 7, '#d6cbb0');
+      rect(x - 20, y - 25, 3, 10, '#806d56');
     }
     rect(x - 28, y + 29, 56, 13, '#f8f0d8');
     rect(x - 28, y + 41, 56, 1, '#c1b490');
@@ -256,4 +288,44 @@ export function paintIsland(
   rect(538, 317, 19, 1, '#639a91');
   rect(545, 311, 5, 3, '#639a91');
   c.globalAlpha = 1;
+  if (night) {
+    rect(0, 0, W, H, '#09132d38');
+    for (let i = 0; i < 32; i++) {
+      const x = seed('starx' + i) % W,
+        y = seed('stary' + i) % 65;
+      c.globalAlpha = 0.55 + Math.sin(t * 0.8 + i) * 0.2;
+      rect(x, y, 2, 2, '#e6e5d3');
+    }
+    c.globalAlpha = 1;
+    ellipse(530, 48, 10, 10, '#e8dfb5');
+    ellipse(534, 44, 9, 9, p.water);
+    const glow = (x: number, y: number, radius: number) => {
+      ellipse(x, y, radius, radius * 0.6, '#f6c56a16');
+      ellipse(x, y, radius * 0.6, radius * 0.4, '#f6c56a22');
+    };
+    island.projects.forEach((_, i) => {
+      const q = point(PLOTS[i].x, PLOTS[i].y);
+      for (const x of [-16, 14]) {
+        glow(q.x + x, q.y - 2, 13);
+        rect(q.x + x - 3, q.y - 7, 7, 9, '#f1cf88');
+        rect(q.x + x, q.y - 7, 1, 9, '#ad8962');
+      }
+    });
+    for (const z of [-1, 3.6, 6.3])
+      for (const x of [-1, 1]) {
+        const q = point(x, z);
+        glow(q.x, q.y - 12, 20);
+        rect(q.x - 1, q.y - 12, 2, 16, '#917d62');
+        rect(q.x - 4, q.y - 18, 8, 8, '#eed18f');
+        rect(q.x - 5, q.y - 20, 10, 2, '#9d947c');
+      }
+    for (let i = 0; i < 14; i++) {
+      const x = 140 + (seed('flyx' + i) % 330) + Math.sin(t + i) * 3,
+        y = 200 + (seed('flyy' + i) % 110) + Math.cos(t * 0.7 + i) * 3;
+      c.globalAlpha = 0.6 + Math.sin(t * 1.1 + i) * 0.25;
+      glow(x, y, 5);
+      rect(x, y, 2, 2, '#e1e7a2');
+    }
+    c.globalAlpha = 1;
+  }
 }

@@ -15,6 +15,7 @@ import {
 import { PALETTES, type Project, type AvatarId, type PaletteId, type StyleId } from '@/lib/island';
 import type { ProjectDetails } from '@/lib/project';
 import { advanceRoom, nearestRoomTarget, ROOM_SPAWN, STATIONS, type StationId } from '@/lib/room';
+import { BUILDINGS, buildingFor, scenePalette, type LightingId } from '@/lib/buildings';
 import { useController } from './use-controller';
 import { GuideCharacter } from './island-guide';
 const PixelRoom = dynamic(() => import('./pixel-room'), {
@@ -60,6 +61,7 @@ export default function ProjectRoom({
   project,
   style,
   palette,
+  lighting = 'day',
   avatar,
   reducedMotion,
   onExit,
@@ -69,6 +71,7 @@ export default function ProjectRoom({
   project: Project;
   style: StyleId;
   palette: PaletteId;
+  lighting?: LightingId;
   avatar: AvatarId;
   reducedMotion: boolean;
   onExit: () => void;
@@ -149,16 +152,21 @@ export default function ProjectRoom({
   }
   const selected = STATIONS.find((s) => s.id === station);
   const languageTotal = details?.languages.reduce((n, l) => n + l.bytes, 0) || 1;
+  const building = buildingFor(project);
   const isDemo = project.owner === 'demo';
   const summary = details?.description || project.description;
   const readme = details?.readme;
   return (
     <main
-      className={'project-room' + (reducedMotion ? ' room-still' : '')}
+      className={
+        'project-room' +
+        (lighting === 'night' ? ' room-night' : '') +
+        (reducedMotion ? ' room-still' : '')
+      }
       style={
         {
           '--room-accent': PALETTES[palette].accent,
-          '--room-water': PALETTES[palette].water,
+          '--room-water': scenePalette(palette, lighting).water,
         } as React.CSSProperties
       }
     >
@@ -215,7 +223,10 @@ export default function ProjectRoom({
           >
             <div className="room-scene-caption">
               <span className="eyebrow">STEP INSIDE THE STORY</span>
-              <span>{style === 'pixel' ? 'Pixel interior' : 'Miniature interior'}</span>
+              <span>
+                {BUILDINGS[building].name} ·{' '}
+                {style === 'pixel' ? 'Pixel interior' : 'Miniature interior'}
+              </span>
             </div>
             <div className="room-render">
               <RoomBoundary>
@@ -224,6 +235,8 @@ export default function ProjectRoom({
                     <PixelRoom
                       identity={`${project.owner}/${project.name}`}
                       palette={palette}
+                      lighting={lighting}
+                      building={building}
                       avatar={avatar}
                       controller={controller}
                       reducedMotion={reducedMotion}
@@ -233,6 +246,8 @@ export default function ProjectRoom({
                     <ThreeRoom
                       identity={`${project.owner}/${project.name}`}
                       palette={palette}
+                      lighting={lighting}
+                      building={building}
                       avatar={avatar}
                       controller={controller}
                       reducedMotion={reducedMotion}

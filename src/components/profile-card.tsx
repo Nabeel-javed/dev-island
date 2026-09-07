@@ -2,16 +2,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { Copy, X } from 'lucide-react';
 import type { Island, PaletteId, StyleId, AvatarId } from '@/lib/island';
+import type { LightingId } from '@/lib/buildings';
 import { shareLinks } from '@/lib/share';
 export default function ProfileCard({
   island,
   palette,
+  lighting = 'day',
   style,
   avatar,
   onClose,
 }: {
   island: Island;
   palette: PaletteId;
+  lighting?: LightingId;
   style: StyleId;
   avatar: AvatarId;
   onClose: () => void;
@@ -25,12 +28,12 @@ export default function ProfileCard({
       shareLinks(
         window.location.origin,
         island,
-        { palette, style, avatar },
+        { palette, style, avatar, lighting },
         new URLSearchParams(window.location.search),
       ),
     );
     dialog.current?.showModal();
-  }, [island, palette, style, avatar]);
+  }, [island, palette, style, avatar, lighting]);
   return (
     <dialog
       className="project-dialog studio-dialog"

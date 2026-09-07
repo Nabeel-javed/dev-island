@@ -30,6 +30,7 @@ import {
   StyleId,
   validUsername,
 } from '@/lib/island';
+import { scenePalette, type LightingId } from '@/lib/buildings';
 import { useController } from './use-controller';
 import { usePassport } from './use-passport';
 import IslandGuide from './island-guide';
@@ -77,6 +78,7 @@ export default function IslandApp({
 }) {
   const [style, setStyle] = useState<StyleId>(initialAppearance.style),
     [palette, setPalette] = useState<PaletteId>(initialAppearance.palette),
+    [lighting, setLighting] = useState<LightingId>(initialAppearance.lighting),
     [avatar, setAvatar] = useState<AvatarId>(initialAppearance.avatar);
   const [selected, setSelected] = useState<number | null>(null),
     [ready, setReady] = useState(false),
@@ -192,11 +194,17 @@ export default function IslandApp({
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setToast(''), 3500);
   };
-  function appearance(next: { style?: StyleId; palette?: PaletteId; avatar?: AvatarId }) {
+  function appearance(next: {
+    style?: StyleId;
+    palette?: PaletteId;
+    avatar?: AvatarId;
+    lighting?: LightingId;
+  }) {
     const s = next.style ?? style,
       p = next.palette ?? palette,
       a = next.avatar ?? avatar;
     if (s !== style) setReady(false);
+    setLighting(next.lighting ?? lighting);
     setStyle(s);
     setPalette(p);
     setAvatar(a);
@@ -204,6 +212,7 @@ export default function IslandApp({
     url.searchParams.set('style', s);
     url.searchParams.set('palette', p);
     url.searchParams.set('avatar', a);
+    url.searchParams.set('lighting', next.lighting ?? lighting);
     window.history.replaceState({}, '', url);
   }
   async function share() {
@@ -274,7 +283,7 @@ export default function IslandApp({
       const response = await fetch(`/api/island/${encodeURIComponent(u)}`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not find this island.');
-      window.location.href = `/u/${encodeURIComponent(u)}?style=${style}&palette=${palette}&avatar=${avatar}`;
+      window.location.href = `/u/${encodeURIComponent(u)}?style=${style}&palette=${palette}&avatar=${avatar}&lighting=${lighting}`;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Please try again.');
       setLoading(false);
@@ -289,6 +298,7 @@ export default function IslandApp({
         project={project}
         style={style}
         palette={palette}
+        lighting={lighting}
         avatar={avatar}
         reducedMotion={reducedMotion}
         onExit={exitRoom}
@@ -424,8 +434,8 @@ export default function IslandApp({
           <div className="island-layout">
             <div className="world-column">
               <div
-                className="world-stage"
-                style={{ background: PALETTES[palette].water }}
+                className={'world-stage' + (lighting === 'night' ? ' world-night' : '')}
+                style={{ background: scenePalette(palette, lighting).water }}
                 ref={stage}
                 tabIndex={0}
                 aria-label="Interactive island. Use arrow keys to walk and Enter or E to open a nearby project."
@@ -445,6 +455,7 @@ export default function IslandApp({
                       <Pixel
                         island={island}
                         palette={palette}
+                        lighting={lighting}
                         avatar={avatar}
                         controller={controller}
                         onSelect={select}
@@ -455,6 +466,7 @@ export default function IslandApp({
                       <Three
                         island={island}
                         palette={palette}
+                        lighting={lighting}
                         avatar={avatar}
                         controller={controller}
                         onSelect={select}
@@ -611,6 +623,21 @@ export default function IslandApp({
               <div className="customize">
                 <div className="section-label">
                   Make yourself at home <Sparkles size={13} />
+                </div>
+                <span className="option-label">Time of day</span>
+                <div className="lighting-toggle" aria-label="Time of day">
+                  <button
+                    aria-pressed={lighting === 'day'}
+                    onClick={() => appearance({ lighting: 'day' })}
+                  >
+                    ☀ Day
+                  </button>
+                  <button
+                    aria-pressed={lighting === 'night'}
+                    onClick={() => appearance({ lighting: 'night' })}
+                  >
+                    ☾ Night
+                  </button>
                 </div>
                 <span className="option-label">Island palette</span>
                 <div className="palettes">
@@ -798,6 +825,7 @@ export default function IslandApp({
         <IslandTrailer
           island={island}
           palette={palette}
+          lighting={lighting}
           avatar={avatar}
           onClose={() => setTrailerOpen(false)}
         />
@@ -806,6 +834,7 @@ export default function IslandApp({
         <ProfileCard
           island={island}
           palette={palette}
+          lighting={lighting}
           style={style}
           avatar={avatar}
           onClose={() => setCardOpen(false)}
