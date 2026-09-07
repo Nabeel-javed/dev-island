@@ -1,7 +1,9 @@
+import type { BuildingId, LightingId } from './buildings';
 export type PaletteId = 'lagoon' | 'sunset' | 'lavender';
 export type StyleId = 'pixel' | '3d';
 export type AvatarId = 'explorer' | 'gardener' | 'sailor' | 'astronaut';
 export type Project = {
+  building?: BuildingId;
   owner: string;
   id: string;
   name: string;
@@ -134,6 +136,7 @@ export function selectProjects(pinned: Project[], owned: Project[]) {
 }
 export function readAppearance(params: URLSearchParams) {
   return {
+    lighting: (params.get('lighting') === 'night' ? 'night' : 'day') as LightingId,
     style: params.get('style') === '3d' ? ('3d' as const) : ('pixel' as const),
     palette: (params.get('palette') && Object.hasOwn(PALETTES, params.get('palette')!)
       ? params.get('palette')
@@ -172,7 +175,7 @@ export const compact = (n: number) =>
 
 export function appearanceFromRecord(record: Record<string, string | string[] | undefined>) {
   const params = new URLSearchParams();
-  for (const key of ['style', 'palette', 'avatar']) {
+  for (const key of ['style', 'palette', 'avatar', 'lighting']) {
     const value = record[key];
     if (typeof value === 'string') params.set(key, value);
   }

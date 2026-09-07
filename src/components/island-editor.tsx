@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, Plus, X } from 'lucide-react';
+import { BUILDINGS, BUILDING_IDS, buildingFor, type BuildingId } from '@/lib/buildings';
 import type { Island, Project } from '@/lib/island';
 import { projectKey, validRepository, type ProjectDetails } from '@/lib/project';
 import { customizationURL } from '@/lib/customization';
@@ -91,8 +92,8 @@ export default function IslandEditor({ island, onClose }: { island: Island; onCl
       <span className="eyebrow">MAKE ROOM FOR YOUR BEST WORK</span>
       <h2 id="editor-title">Arrange your island.</h2>
       <p>
-        Choose up to six public projects, arrange their buildings, and write a welcome. Your changes
-        live in a shareable link.
+        Choose up to six public projects, pick a building style for each, and write a welcome. Your
+        changes live in a shareable link.
       </p>
       <label className="studio-label" htmlFor="island-intro">
         Welcome message <span>{intro.length}/240</span>
@@ -116,6 +117,26 @@ export default function IslandEditor({ island, onClose }: { island: Island; onCl
                 {project.owner}/{project.name}
               </small>
             </div>
+            <label className="editor-building-style">
+              <span className="sr-only">Building style for {project.name}</span>
+              <select
+                value={buildingFor(project)}
+                disabled={busy}
+                onChange={(e) =>
+                  setProjects(
+                    projects.map((p, j) =>
+                      j === i ? { ...p, building: e.target.value as BuildingId } : p,
+                    ),
+                  )
+                }
+              >
+                {BUILDING_IDS.map((id) => (
+                  <option key={id} value={id}>
+                    {BUILDINGS[id].name}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               disabled={i === 0 || busy}
               aria-label={`Move ${project.name} earlier`}
@@ -195,7 +216,8 @@ export default function IslandEditor({ island, onClose }: { island: Island; onCl
           disabled={busy}
           onClick={() => {
             const url = new URL(window.location.href);
-            for (const key of ['projects', 'intro', 'project']) url.searchParams.delete(key);
+            for (const key of ['projects', 'intro', 'project', 'buildings'])
+              url.searchParams.delete(key);
             url.hash = 'explore';
             window.location.href = url.href;
           }}
