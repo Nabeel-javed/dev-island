@@ -2587,6 +2587,9 @@ footer button {
 .world-night .world-hint {
   color: #d5dfd6;
 }
+.world-night .world-hint {
+  background: #293e4eee;
+}
 .world-night .house-label {
   background: #293e4e;
   color: #f1e3be;

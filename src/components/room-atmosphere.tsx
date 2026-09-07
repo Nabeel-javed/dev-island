@@ -83,7 +83,7 @@ export default function RoomAtmosphere({
           decay={2}
         />
       </group>
-      <group position={[-0.4, 2.58, -4.64]}>
+      <group position={[-1, 2.92, -4.64]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.32, 0.32, 0.08, 32]} />
           <meshStandardMaterial color="#997d59" />
