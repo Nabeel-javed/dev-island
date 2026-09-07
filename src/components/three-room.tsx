@@ -65,8 +65,8 @@ function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: Cam
       focus.current.set(...frame.target);
     } else {
       const c = controller.current;
-      focus.current.set(c.x * 0.4, 1.1, c.y * 0.25 - 1.3);
-      destination.current.set(Math.sin(angle) * 11, 5.8, Math.cos(angle) * 11);
+      focus.current.set(c.x * (size.width < 760 ? 0.85 : 0.4), 1.1, c.y * 0.25 - 1.3);
+      destination.current.set(Math.sin(angle) * 8, 3.3, Math.cos(angle) * 8);
       destination.current.multiplyScalar(1 / zoom).add(focus.current);
     }
     controls.current.target.copy(focus.current);
@@ -87,7 +87,7 @@ function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: Cam
       orbit.update();
     } else if (!overview && controller.current.moving && !controller.current.paused) {
       const c = controller.current;
-      focus.current.set(c.x * 0.4, 1.1, c.y * 0.25 - 1.3);
+      focus.current.set(c.x * (size.width < 760 ? 0.85 : 0.4), 1.1, c.y * 0.25 - 1.3);
       shift.current
         .copy(focus.current)
         .sub(orbit.target)
@@ -133,6 +133,7 @@ function Room(props: RoomSceneProps & CameraProps) {
   };
   return (
     <>
+      <color attach="background" args={[night ? '#20333a' : theme.wall]} />
       <Camera {...props} />
       <RoomActivity reducedMotion={props.reducedMotion} night={night} />
       <ambientLight intensity={night ? 0.55 : 0.8} />

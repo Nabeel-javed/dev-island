@@ -3132,15 +3132,15 @@ footer button {
     max-width: calc(100% - 20px);
   }
   .room-immersive .room-camera-tools {
-    bottom: 137px;
+    bottom: 36px;
     right: 10px;
   }
   .room-immersive .room-touch-controls {
-    bottom: 43px;
+    bottom: 36px;
     left: 12px;
   }
   .room-immersive .room-interact {
-    bottom: 51px;
+    bottom: 100px;
     right: 12px;
     left: auto;
     transform: none;
@@ -3151,9 +3151,7 @@ footer button {
     border-radius: 0;
   }
   .room-look-hint {
-    bottom: 191px;
-    right: 10px;
-    font-size: 10px;
+    display: none;
   }
   .room-immersive .room-footer {
     padding: 6px 12px;

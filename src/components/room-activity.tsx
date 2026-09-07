@@ -35,7 +35,7 @@ export default function RoomActivity({
   });
   return (
     <>
-      <group ref={model} position={[3.7, 3.25, -2.2]}>
+      <group ref={model} position={[4.45, 3.25, -2.2]}>
         <mesh rotation={[0.4, 0, 0.4]}>
           <icosahedronGeometry args={[0.34, 0]} />
           <meshStandardMaterial
@@ -44,7 +44,8 @@ export default function RoomActivity({
             emissiveIntensity={night ? 1.2 : 0.4}
             metalness={0.4}
             roughness={0.2}
-            wireframe
+            transparent
+            opacity={0.8}
           />
         </mesh>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
