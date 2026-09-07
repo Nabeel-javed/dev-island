@@ -3017,3 +3017,145 @@ footer button {
     flex-shrink: 0;
   }
 }
+
+/* The immersive renderer owns the viewport; navigation floats above the scene. */
+.room-immersive {
+  overflow: hidden;
+}
+.room-immersive .room-layout {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.room-immersive .room-world-column {
+  position: absolute;
+  inset: 0;
+}
+.room-immersive .room-world {
+  min-height: 0;
+  height: 100%;
+}
+.room-immersive .room-render {
+  inset: 0;
+}
+.room-immersive .room-header {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 20px;
+  right: 20px;
+  min-height: 0;
+  padding: 10px 12px;
+  z-index: 25;
+  gap: 16px;
+  border: 1px solid #ffffff80;
+  border-radius: 16px;
+  background: #fbfaf4dc;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 8px 30px #183f3610;
+}
+.room-immersive .room-identity h1 {
+  font-size: 20px;
+}
+.room-immersive .room-tour {
+  position: absolute;
+  left: 20px;
+  top: 99px;
+  z-index: 24;
+  max-width: min(480px, calc(100% - 40px));
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: #f8f7ecdf;
+  border: 1px solid #ffffff70;
+  backdrop-filter: blur(12px);
+  font-size: 11px;
+}
+.room-immersive .room-tour p {
+  display: none;
+}
+.room-immersive .room-scene-caption {
+  display: none;
+}
+.room-immersive .room-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 14;
+  background: #fbfaf4d9;
+  padding: 7px 20px;
+  backdrop-filter: blur(12px);
+}
+.room-immersive .room-interact {
+  bottom: 54px;
+}
+.room-immersive .room-camera-tools {
+  bottom: 56px;
+  right: 20px;
+}
+.room-immersive .room-panel {
+  position: absolute;
+  top: 94px;
+  bottom: 40px;
+  right: 20px;
+  width: 420px;
+  z-index: 30;
+  border-radius: 16px;
+  box-shadow: 0 20px 80px #152b3930;
+}
+.room-look-hint {
+  position: absolute;
+  bottom: 110px;
+  right: 23px;
+  z-index: 13;
+  color: #294d43;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f8f6eece;
+  pointer-events: none;
+}
+.room-immersive.room-night .room-header,
+.room-immersive.room-night .room-tour {
+  background: #f3f0e7e8;
+}
+@media (max-width: 760px) {
+  .room-immersive .room-header {
+    left: 10px;
+    right: 10px;
+    top: max(10px, env(safe-area-inset-top));
+    gap: 10px;
+    padding: 8px;
+  }
+  .room-immersive .room-tour {
+    top: 88px;
+    left: 10px;
+    max-width: calc(100% - 20px);
+  }
+  .room-immersive .room-camera-tools {
+    bottom: 137px;
+    right: 10px;
+  }
+  .room-immersive .room-touch-controls {
+    bottom: 43px;
+    left: 12px;
+  }
+  .room-immersive .room-interact {
+    bottom: 51px;
+    right: 12px;
+    left: auto;
+    transform: none;
+  }
+  .room-immersive .room-panel {
+    inset: 0;
+    width: 100%;
+    border-radius: 0;
+  }
+  .room-look-hint {
+    bottom: 191px;
+    right: 10px;
+    font-size: 10px;
+  }
+  .room-immersive .room-footer {
+    padding: 6px 12px;
+  }
+}

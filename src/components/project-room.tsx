@@ -149,6 +149,7 @@ export default function ProjectRoom({
     <main
       className={
         'project-room' +
+        (style === '3d' ? ' room-immersive' : '') +
         (lighting === 'night' ? ' room-night' : '') +
         (reducedMotion ? ' room-still' : '')
       }
@@ -215,8 +216,7 @@ export default function ProjectRoom({
             <div className="room-scene-caption">
               <span className="eyebrow">STEP INSIDE THE STORY</span>
               <span>
-                {BUILDINGS[building].name} ·{' '}
-                {style === 'pixel' ? 'Pixel interior' : 'Miniature interior'}
+                {BUILDINGS[building].name} · {style === 'pixel' ? 'Pixel interior' : '3D interior'}
               </span>
             </div>
             <div className="room-render">
