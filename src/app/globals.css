@@ -3518,3 +3518,32 @@ footer button {
     gap: 3px;
   }
 }
+
+/* Keep floating controls reachable when the exploration canvas fills a phone. */
+.room-header {
+  position: relative;
+}
+.room-header .graphics-settings {
+  position: static;
+}
+.room-header .graphics-popover {
+  right: 8px;
+  top: calc(100% + 8px);
+}
+.has-expanded-world > .project-peek {
+  min-height: 0;
+  padding: 14px 18px;
+  max-height: 35dvh;
+  overflow-y: auto;
+}
+.has-expanded-world .peek-copy h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 700px) {
+  .world-expanded .island-camera-tools,
+  .world-expanded .mobile-dpad {
+    bottom: 210px;
+  }
+}
