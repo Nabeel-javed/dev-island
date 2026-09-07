@@ -22,9 +22,11 @@ import {
   Layers3,
   Leaf,
   MapPin,
+  Moon,
   Share2,
   Sparkles,
   Star,
+  Sun,
   X,
 } from 'lucide-react';
 import {
@@ -494,9 +496,26 @@ export default function IslandApp({
                     <span />
                     {style === 'pixel' ? 'THE PIXEL ARCHIPELAGO' : 'A WORLD IN MINIATURE'}
                   </span>
-                  <span className="coordinate">
-                    {style === 'pixel' ? '01' : '02'} / EXPLORATIONS
-                  </span>
+                  <div className="world-top-actions">
+                    <span className="coordinate">
+                      {style === 'pixel' ? '01' : '02'} / EXPLORATIONS
+                    </span>
+                    <button
+                      type="button"
+                      className="lighting-icon"
+                      aria-label={
+                        lighting === 'day' ? 'Switch to night mode' : 'Switch to day mode'
+                      }
+                      title={lighting === 'day' ? 'Switch to night mode' : 'Switch to day mode'}
+                      onClick={() => appearance({ lighting: lighting === 'day' ? 'night' : 'day' })}
+                    >
+                      {lighting === 'day' ? (
+                        <Moon size={18} aria-hidden="true" />
+                      ) : (
+                        <Sun size={18} aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <SceneBoundary key={style}>
                   <>
@@ -699,21 +718,6 @@ export default function IslandApp({
                 <div className="section-label">
                   Make yourself at home <Sparkles size={13} />
                 </div>
-                <span className="option-label">Time of day</span>
-                <div className="lighting-toggle" aria-label="Time of day">
-                  <button
-                    aria-pressed={lighting === 'day'}
-                    onClick={() => appearance({ lighting: 'day' })}
-                  >
-                    ☀ Day
-                  </button>
-                  <button
-                    aria-pressed={lighting === 'night'}
-                    onClick={() => appearance({ lighting: 'night' })}
-                  >
-                    ☾ Night
-                  </button>
-                </div>
                 <span className="option-label">Island palette</span>
                 <div className="palettes">
                   {(Object.keys(PALETTES) as PaletteId[]).map((id) => (
@@ -767,9 +771,6 @@ export default function IslandApp({
           </div>
           {island.notice && <p className="data-notice">{island.notice}</p>}
           <div className="projects-heading">
-            <div>
-              <span className="eyebrow">BUILT WITH CURIOSITY</span>
-            </div>
             <span>
               {island.projects.length} places to explore <ChevronRight size={15} />
             </span>
