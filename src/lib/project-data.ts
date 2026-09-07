@@ -72,7 +72,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   store = {
     async get(key) {
       try {
-        return await redis.get<ProjectSnapshot>('project:v1:' + key);
+        return await redis.get<ProjectSnapshot>('project:v2:' + key);
       } catch {
         return memory.get(key);
       }
@@ -80,7 +80,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
     async set(key, value) {
       await memory.set(key, value);
       try {
-        await redis.set('project:v1:' + key, value, { ex: 604800 });
+        await redis.set('project:v2:' + key, value, { ex: 604800 });
       } catch {
         console.warn(JSON.stringify({ event: 'project_cache_unavailable' }));
       }
@@ -88,7 +88,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
     async delete(key) {
       await memory.delete(key);
       try {
-        await redis.del('project:v1:' + key);
+        await redis.del('project:v2:' + key);
       } catch {
         console.warn(JSON.stringify({ event: 'project_cache_unavailable' }));
       }
@@ -103,7 +103,7 @@ export async function getProject(owner: string, name: string): Promise<ProjectDe
     const project = DEMO.projects.find((p) => p.name.toLowerCase() === name.toLowerCase());
     if (!project) throw new GitHubError('This sample project could not be found.', 404);
     const readme = await renderReadme(
-      `# ${project.name}\n\n${project.description}\n\nThis is a fictional project created to demonstrate Dev Island’s rooms.\n\n## Features\n\n- A thoughtful interface with keyboard access\n- Responsive layouts for small screens\n- Customizable colors and a calm reading experience\n\n## Getting started\n\nExplore the four stations in this room. In a real project, this bookshelf displays the repository’s own README.\n\n\`\`\`text\nwalk → discover → build something\n\`\`\`\n\n## Design notes\n\n| Principle | Approach |\n| --- | --- |\n| Clarity | Keep the important things easy to find |\n| Accessibility | Support keyboard and touch |\n| Delight | Leave room for small discoveries |`,
+      `# ${project.name}\n\n${project.description}\n\nThis is a fictional project created to demonstrate Dev Island’s rooms.\n\n## Features\n\n- A thoughtful interface with keyboard access\n- Responsive layouts for small screens\n- Customizable colors and a calm reading experience\n\n## Problem\n\nA useful project needs a clear, welcoming way to explain what it does.\n\n## My role\n\nThis fictional example demonstrates how an author can describe their contribution in the README.\n\n## Results\n\nVisitors can explore four stations and discover the project at their own pace. This is sample content, not a measured outcome.\n\n## Getting started\n\nExplore the four stations in this room. In a real project, this bookshelf displays the repository’s own README.\n\n\`\`\`text\nwalk → discover → build something\n\`\`\`\n\n## Design notes\n\n| Principle | Approach |\n| --- | --- |\n| Clarity | Keep the important things easy to find |\n| Accessibility | Support keyboard and touch |\n| Delight | Leave room for small discoveries |`,
       'https://github.com',
     );
     readme.images = [

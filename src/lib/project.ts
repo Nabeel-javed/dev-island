@@ -1,3 +1,4 @@
+import type { ProjectStory } from './story';
 export type Availability = 'available' | 'missing' | 'unavailable';
 export type ProjectDetails = {
   owner: string;
@@ -16,6 +17,7 @@ export type ProjectDetails = {
     status: Availability;
     html: string;
     introduction: string;
+    story?: ProjectStory;
     features: string;
     images: { src: string; alt: string }[];
     url: string;

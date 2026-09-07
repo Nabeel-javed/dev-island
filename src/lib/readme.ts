@@ -9,6 +9,7 @@ import { visit } from 'unist-util-visit';
 import { toText } from 'hast-util-to-text';
 import type { Root, Element } from 'hast';
 import type { ProjectDetails } from './project';
+import { storyFromSections, type StorySection } from './story';
 
 export const README_LIMIT = 200 * 1024;
 export function resolveReadmeUrl(value: string, base: string, image = false) {
@@ -91,6 +92,21 @@ export async function renderReadme(
         images.push({ src, alt: String(node.properties.alt) });
     }
   });
+  const sections: StorySection[] = [];
+  let section: StorySection | undefined;
+  for (const node of tree.children) {
+    if (node.type !== 'element') continue;
+    if (/^h[1-6]$/.test(node.tagName)) {
+      section = { heading: toText(node), text: '' };
+      sections.push(section);
+    } else if (
+      section &&
+      section.text.length < 1000 &&
+      ['p', 'ul', 'ol', 'blockquote'].includes(node.tagName)
+    ) {
+      section.text += toText(node).trim() + '\n';
+    }
+  }
   const paragraphs: string[] = [];
   let features = '';
   let collecting = false;
@@ -109,6 +125,7 @@ export async function renderReadme(
   return {
     status: 'available',
     html: String(unified().use(rehypeStringify).stringify(tree)),
+    story: storyFromSections(sections),
     introduction: paragraphs.join('\n\n').slice(0, 1200),
     features: features.slice(0, 2000).trim(),
     images,

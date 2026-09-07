@@ -18,6 +18,7 @@ import { advanceRoom, nearestRoomTarget, ROOM_SPAWN, STATIONS, type StationId } 
 import { BUILDINGS, buildingFor, scenePalette, type LightingId } from '@/lib/buildings';
 import { useController } from './use-controller';
 import { GuideCharacter } from './island-guide';
+import ProjectStory from './project-story';
 const PixelRoom = dynamic(() => import('./pixel-room'), {
   ssr: false,
   loading: () => <p className="room-graphics-note">Opening the room…</p>,
@@ -213,6 +214,15 @@ export default function ProjectRoom({
           </>
         )}
       </section>
+      <section className="room-story-intro" inert={station !== null}>
+        <div>
+          <span className="eyebrow">WHAT LIVES HERE</span>
+          <p>{summary || 'Step inside to discover the project.'}</p>
+        </div>
+        <button className="studio-secondary" onClick={() => setStation('overview')}>
+          Read the project story <ArrowUpRight size={15} />
+        </button>
+      </section>
       <div className={'room-layout' + (station ? ' reading' : '')}>
         <div className="room-world-column" inert={station !== null}>
           <div
@@ -397,54 +407,7 @@ export default function ProjectRoom({
                   This is a fictional sample. Real rooms show their repository’s own content.
                 </p>
               )}
-              {station === 'overview' && (
-                <>
-                  <div className="room-overview-icon">
-                    <Sparkles size={28} />
-                  </div>
-                  <h3>{project.name}</h3>
-                  <p className="room-lead">
-                    {summary || 'This repository has no description yet.'}
-                  </p>
-                  <div className="room-facts">
-                    <span>
-                      <Star size={15} />
-                      {(details?.stars ?? project.stars).toLocaleString()} stars
-                    </span>
-                    <span>{details?.license || 'License not specified'}</span>
-                    <span>
-                      Updated{' '}
-                      {new Date(details?.updatedAt || project.updatedAt).toLocaleDateString('en', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                  {readme?.introduction && (
-                    <>
-                      <h4>From the README</h4>
-                      <p className="source-excerpt">{readme.introduction}</p>
-                    </>
-                  )}
-                  {readme?.features && (
-                    <>
-                      <h4>Features & highlights</h4>
-                      <p className="source-excerpt">{readme.features}</p>
-                    </>
-                  )}
-                  {!isDemo && (
-                    <a
-                      className="room-link"
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Explore on GitHub <ArrowUpRight size={16} />
-                    </a>
-                  )}
-                </>
-              )}
+              {station === 'overview' && <ProjectStory project={project} details={details} />}
               {station === 'readme' && readme && (
                 <>
                   {readme.status === 'missing' ? (

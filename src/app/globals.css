@@ -2634,3 +2634,97 @@ footer button {
   margin-top: 24px;
   text-decoration: underline;
 }
+
+.room-story-intro {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1380px;
+  margin: 0 auto 24px;
+  padding: 20px 24px;
+  background: #f2f0e5;
+  border: 1px solid #dfe3d5;
+  border-radius: 16px;
+}
+.room-story-intro p {
+  margin: 8px 0 0;
+  max-width: 800px;
+  line-height: 1.6;
+}
+.room-story-intro button {
+  flex-shrink: 0;
+}
+.story-purpose {
+  font-size: 20px;
+  line-height: 1.65;
+}
+.story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0;
+}
+.story-sections {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+}
+.story-section {
+  padding: 22px;
+  border: 1px solid #dce1d4;
+  border-radius: 14px;
+  background: #f5f5ec;
+}
+.story-section h4 {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+.story-section p {
+  margin: 0;
+  white-space: pre-line;
+  line-height: 1.7;
+}
+.story-section small {
+  display: block;
+  margin-top: 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #788672;
+}
+.story-gallery figure {
+  margin: 16px 0;
+}
+.story-gallery img {
+  width: 100%;
+  height: auto;
+  border: 1px solid #dce1d4;
+  border-radius: 12px;
+}
+.story-gallery figcaption {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #697963;
+}
+.room-night .room-story-intro,
+.room-night .story-section {
+  background: #263f45;
+  border-color: #4b6164;
+  color: #e4e8d6;
+}
+.room-night .story-section small,
+.room-night .story-gallery figcaption {
+  color: #b6c7be;
+}
+@media (max-width: 700px) {
+  .room-story-intro {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0 16px 20px;
+    padding: 18px;
+  }
+  .story-purpose {
+    font-size: 18px;
+  }
+}
