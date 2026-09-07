@@ -9,8 +9,25 @@ export const metadata: Metadata = {
           ? `https://${process.env.VERCEL_URL}`
           : 'http://localhost:3100'),
   ),
-  openGraph: { images: ['/api/og'] },
-  twitter: { card: 'summary_large_image', images: ['/api/og'] },
+  openGraph: {
+    type: 'website',
+    siteName: 'Dev Island',
+    images: [
+      {
+        url: '/social/dev-island-3d-v2.jpg',
+        width: 1200,
+        height: 630,
+        type: 'image/jpeg',
+        alt: 'Dev Island — Your GitHub. A little world. A miniature 3D island with six project buildings.',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: [
+      { url: '/social/dev-island-3d-v2.jpg', alt: 'Dev Island — Your GitHub. A little world.' },
+    ],
+  },
   title: 'Dev Island — Your code, a world of its own',
   description: 'Explore a playable island made from your GitHub projects.',
 };
