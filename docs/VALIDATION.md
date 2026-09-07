@@ -106,3 +106,10 @@ Production still has no configured GitHub token or Upstash credentials. Public R
 - 51 tests passed, including projection checks across five canvas sizes and three viewing angles. TypeScript, production build and formatting passed during implementation.
 - Native Brave visual checks confirmed the desktop room, zoom, angle change, reset and README side panel. The room refits alongside the panel. At an emulated 390 × 700 viewport, the room and touch/camera controls remain visible and the README opens as a full-screen panel.
 - This is browser emulation, not real-device performance testing. Safari, physical phones and reduced-motion emulation remain untested in this pass. Existing Three.js deprecation warnings are visible in development; no frame-rate claims are made.
+
+### Fullscreen immersive rooms — 2026-09-07
+
+- The 3D scene now fills the viewport behind floating navigation and detail panels. Default framing uses a close, lower perspective; drag rotation, wheel/pinch zoom, a reset action and an optional whole-room view use OrbitControls. The camera follows character movement, more closely on narrow canvases.
+- Added rotating geometry over the technology desk, animated demo monitor bars, a moving book page and rising mug steam. Reduced motion fixes these animations and skips camera arrival interpolation/damping.
+- 51 tests, TypeScript, production build and formatting passed. Native Brave screenshots confirmed the close desktop interior, readable overlay README, emulated 390 × 680 mobile view, viewing-angle control and whole-room toggle. Mobile camera controls were moved below the character after visual review.
+- Physical-phone performance, Safari and pinch gestures on real touch hardware remain unmeasured. Reduced-motion handling was reviewed in source, not browser-emulated in this pass.
