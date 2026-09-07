@@ -6,6 +6,7 @@ import { PALETTES, type Project, type AvatarId, type PaletteId, type StyleId } f
 import type { ProjectDetails } from '@/lib/project';
 import { advanceRoom, nearestRoomTarget, ROOM_SPAWN, STATIONS, type StationId } from '@/lib/room';
 import { BUILDINGS, buildingFor, scenePalette, type LightingId } from '@/lib/buildings';
+import GraphicsSettings from './graphics-settings';
 import RepositoryOverview from './repository-overview';
 import { useController } from './use-controller';
 import { GuideCharacter } from './island-guide';
@@ -170,6 +171,7 @@ export default function ProjectRoom({
           <span>{isDemo ? 'SAMPLE PROJECT ROOM' : `@${project.owner} / PROJECT ROOM`}</span>
           <h1>{project.name}</h1>
         </div>
+        <GraphicsSettings />
         <button className="room-share" onClick={share}>
           <Share2 size={16} />
           <span>Share room</span>

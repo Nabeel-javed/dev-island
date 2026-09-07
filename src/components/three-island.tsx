@@ -9,6 +9,8 @@ import { BUILDINGS, buildingFor, scenePalette } from '@/lib/buildings';
 import NightAtmosphere from './night-atmosphere';
 import IslandAtmosphere from './island-atmosphere';
 import ShaderWater from './shader-water';
+import SceneLighting, { GraphicsPerformance } from './scene-lighting';
+import { useGraphics, GRAPHICS } from './graphics-settings';
 import CoastalLife from './coastal-life';
 import { trailerFrame } from '@/lib/trailer';
 type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
@@ -418,6 +420,7 @@ function Garden({ days }: { days: Day[] }) {
   );
 }
 function World(props: SceneProps) {
+  const { level } = useGraphics();
   const p = scenePalette(props.palette, props.lighting),
     night = props.lighting === 'night';
   const ready = useRef(false);
@@ -437,7 +440,9 @@ function World(props: SceneProps) {
     <>
       <color attach="background" args={[p.water]} />
       <fog attach="fog" args={[p.water, 40, 85]} />
-      <ambientLight intensity={night ? 0.45 : 0.65} />
+      <SceneLighting night={night} />
+      <GraphicsPerformance />
+      <ambientLight intensity={night ? 0.28 : 0.3} />
       <hemisphereLight
         args={[night ? '#a6bce9' : '#fff5dd', night ? '#24444b' : '#a0bba5', night ? 0.7 : 1.1]}
       />
@@ -446,7 +451,8 @@ function World(props: SceneProps) {
         intensity={night ? 1.1 : 3.2}
         color={night ? '#bccff6' : '#fff1cf'}
         castShadow
-        shadow-mapSize={[1024, 1024]}
+        key={level}
+        shadow-mapSize={[GRAPHICS[level].shadowSize, GRAPHICS[level].shadowSize]}
         shadow-camera-left={-15}
         shadow-camera-right={15}
         shadow-camera-top={15}
@@ -552,13 +558,14 @@ function GraphicsFallback({ onReady }: { onReady: () => void }) {
   );
 }
 export default function ThreeIsland(props: SceneProps) {
+  const { level } = useGraphics();
   return (
     <div className="scene-render three-render" role="img" aria-label="Playable miniature 3D island">
       <Canvas
         shadows
         orthographic
         camera={{ position: [14, 18, 22], zoom: 28, near: 0.1, far: 150 }}
-        dpr={[1, 1.5]}
+        dpr={[1, GRAPHICS[level].dpr]}
         gl={{ antialias: true, preserveDrawingBuffer: true }}
         fallback={<GraphicsFallback onReady={props.onReady} />}
       >

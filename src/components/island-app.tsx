@@ -40,6 +40,7 @@ import {
   validUsername,
 } from '@/lib/island';
 import { scenePalette, type LightingId } from '@/lib/buildings';
+import GraphicsSettings, { GraphicsProvider, useGraphics } from './graphics-settings';
 import { useController } from './use-controller';
 import { useEntrance } from './use-entrance';
 import type { DoorwayFrame } from '@/lib/doorway';
@@ -81,7 +82,7 @@ function Logo() {
     </svg>
   );
 }
-export default function IslandApp({
+function IslandExperience({
   island,
   initialAppearance = readAppearance(new URLSearchParams()),
 }: {
@@ -97,7 +98,7 @@ export default function IslandApp({
   const entryStart = useRef<(index: number) => void>(() => {});
   const [selected, setSelected] = useState<number | null>(null),
     [ready, setReady] = useState(false),
-    [reducedMotion, setReducedMotion] = useState(false),
+    [systemReducedMotion, setReducedMotion] = useState(false),
     [guideOpen, setGuideOpen] = useState(false),
     [cardOpen, setCardOpen] = useState(false),
     [trailerOpen, setTrailerOpen] = useState(false),
@@ -107,6 +108,8 @@ export default function IslandApp({
     [username, setUsername] = useState(''),
     [error, setError] = useState(''),
     [about, setAbout] = useState(false);
+  const { still } = useGraphics();
+  const reducedMotion = systemReducedMotion || still;
   const router = useRouter();
   const [loading, startNavigation] = useTransition();
   const { visited, collect, persistent } = usePassport(island);
@@ -495,6 +498,7 @@ export default function IslandApp({
                     {style === 'pixel' ? 'THE PIXEL ARCHIPELAGO' : 'A WORLD IN MINIATURE'}
                   </span>
                   <div className="world-top-actions">
+                    <GraphicsSettings />
                     <span className="coordinate">
                       {style === 'pixel' ? '01' : '02'} / EXPLORATIONS
                     </span>
@@ -873,5 +877,13 @@ export default function IslandApp({
         </div>
       )}
     </>
+  );
+}
+
+export default function IslandApp(props: Parameters<typeof IslandExperience>[0]) {
+  return (
+    <GraphicsProvider>
+      <IslandExperience {...props} />
+    </GraphicsProvider>
   );
 }

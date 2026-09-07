@@ -3220,3 +3220,57 @@ footer button {
   cursor: pointer;
   font-weight: 600;
 }
+
+.graphics-settings {
+  position: relative;
+  pointer-events: auto;
+}
+.graphics-popover {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  width: min(280px, calc(100vw - 40px));
+  padding: 18px;
+  border: 1px solid #c9d4c3;
+  border-radius: 14px;
+  background: #fffdf6;
+  color: #344a40;
+  box-shadow: 0 16px 50px #152e302b;
+  z-index: 55;
+  font-size: 13px;
+  text-align: left;
+}
+.graphics-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.graphics-heading button {
+  background: transparent;
+  border: 0;
+  padding: 6px;
+  color: inherit;
+}
+.graphics-popover select {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid #c9d4c3;
+  border-radius: 7px;
+  color: inherit;
+  background: #f5f5eb;
+}
+.graphics-popover p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 10px 0;
+  color: #677562;
+}
+.motion-setting {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-top: 18px;
+}

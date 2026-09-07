@@ -1,4 +1,6 @@
 'use client';
+import SceneLighting, { GraphicsPerformance } from './scene-lighting';
+import { useGraphics, GRAPHICS } from './graphics-settings';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Html, RoundedBox, OrbitControls } from '@react-three/drei';
 import { useEffect, useState, useRef, type ComponentRef } from 'react';
@@ -130,6 +132,7 @@ function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: Cam
   );
 }
 function Room(props: RoomSceneProps & CameraProps) {
+  const { level } = useGraphics();
   const [hovered, setHovered] = useState(-1);
   useEffect(
     () => () => {
@@ -151,7 +154,9 @@ function Room(props: RoomSceneProps & CameraProps) {
       <RoomActivity reducedMotion={props.reducedMotion} night={night} />
       <RoomWindow reducedMotion={props.reducedMotion} night={night} />
       <RoomArchitecture night={night} />
-      <ambientLight intensity={night ? 0.55 : 0.8} />
+      <SceneLighting night={night} interior />
+      <GraphicsPerformance />
+      <ambientLight intensity={night ? 0.35 : 0.4} />
       <hemisphereLight args={[night ? '#a6bce9' : '#fff3da', '#798b72', 0.65]} />
       <RoomAtmosphere reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
       <RoomFurnishings reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
@@ -160,7 +165,8 @@ function Room(props: RoomSceneProps & CameraProps) {
         intensity={night ? 0.9 : 2.7}
         color={night ? '#becfeb' : '#fff3dc'}
         castShadow
-        shadow-mapSize={[1024, 1024]}
+        key={level}
+        shadow-mapSize={[GRAPHICS[level].shadowSize, GRAPHICS[level].shadowSize]}
         shadow-camera-left={-10}
         shadow-camera-right={10}
         shadow-camera-top={10}
@@ -362,6 +368,7 @@ function Room(props: RoomSceneProps & CameraProps) {
   );
 }
 export default function ThreeRoom(props: RoomSceneProps) {
+  const { level } = useGraphics();
   const [zoom, setZoom] = useState(1),
     [angle, setAngle] = useState(0),
     [overview, setOverview] = useState(false),
@@ -371,7 +378,7 @@ export default function ThreeRoom(props: RoomSceneProps) {
       <Canvas
         shadows
         camera={{ position: [11, 10, 16], fov: ROOM_FOV, near: 0.1, far: 250 }}
-        dpr={[1, 1.5]}
+        dpr={[1, GRAPHICS[level].dpr]}
         fallback={
           <p className="room-graphics-note">
             3D graphics are unavailable. Return to the island and choose Pixel island.
