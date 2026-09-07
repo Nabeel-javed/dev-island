@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { ArrowUpRight, BookOpen, Monitor, Star } from 'lucide-react';
+import RepositoryOverview from './repository-overview';
 import type { Project } from '@/lib/island';
 import type { ProjectDetails } from '@/lib/project';
 function StoryImage({ src, alt }: { src: string; alt: string }) {
@@ -35,7 +36,12 @@ export default function ProjectStory({
       <p className="story-purpose">
         {details?.description ||
           project.description ||
-          'Explore the README to learn about this project.'}
+          readme?.introduction ||
+          (details?.overview
+            ? 'The author has not provided a repository description. See the file-based overview below.'
+            : details
+              ? 'There is not enough documentation to explain this project yet.'
+              : 'Loading project information…')}
       </p>
       <div className="story-actions">
         {homepage && !demo && (
@@ -69,6 +75,7 @@ export default function ProjectStory({
           })}
         </span>
       </div>
+      {details?.overview && <RepositoryOverview overview={details.overview} />}
       <div className="story-sections">
         {(
           [
@@ -112,7 +119,7 @@ export default function ProjectStory({
           ))}
         </section>
       )}
-      {readme?.url && !demo && (
+      {readme?.status === 'available' && readme.url && !demo && (
         <a className="room-link" href={readme.url} target="_blank" rel="noopener noreferrer">
           <BookOpen size={16} /> Read the source README <ArrowUpRight size={14} />
         </a>

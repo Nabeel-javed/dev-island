@@ -6,6 +6,7 @@ import { PALETTES, type Project, type AvatarId, type PaletteId, type StyleId } f
 import type { ProjectDetails } from '@/lib/project';
 import { advanceRoom, nearestRoomTarget, ROOM_SPAWN, STATIONS, type StationId } from '@/lib/room';
 import { BUILDINGS, buildingFor, scenePalette, type LightingId } from '@/lib/buildings';
+import RepositoryOverview from './repository-overview';
 import { useController } from './use-controller';
 import { GuideCharacter } from './island-guide';
 import ProjectStory from './project-story';
@@ -397,6 +398,9 @@ export default function ProjectRoom({
                       }}
                     />
                   )}
+                  {readme.status !== 'available' && details?.overview && (
+                    <RepositoryOverview overview={details.overview} />
+                  )}
                   {readme.truncated && (
                     <p className="room-notice">
                       This README is too large to show in full here. Continue reading on GitHub.
@@ -409,7 +413,10 @@ export default function ProjectRoom({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Read on GitHub <ArrowUpRight size={16} />
+                      {readme.status === 'available'
+                        ? 'Read on GitHub'
+                        : 'Explore repository files'}{' '}
+                      <ArrowUpRight size={16} />
                     </a>
                   )}
                 </>
