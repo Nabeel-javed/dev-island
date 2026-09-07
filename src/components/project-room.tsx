@@ -16,6 +16,7 @@ import { PALETTES, type Project, type AvatarId, type PaletteId, type StyleId } f
 import type { ProjectDetails } from '@/lib/project';
 import { advanceRoom, nearestRoomTarget, ROOM_SPAWN, STATIONS, type StationId } from '@/lib/room';
 import { useController } from './use-controller';
+import { GuideCharacter } from './island-guide';
 const PixelRoom = dynamic(() => import('./pixel-room'), {
   ssr: false,
   loading: () => <p className="room-graphics-note">Opening the room…</p>,
@@ -62,6 +63,8 @@ export default function ProjectRoom({
   avatar,
   reducedMotion,
   onExit,
+  tour,
+  stamps,
 }: {
   project: Project;
   style: StyleId;
@@ -69,6 +72,8 @@ export default function ProjectRoom({
   avatar: AvatarId;
   reducedMotion: boolean;
   onExit: () => void;
+  stamps: { count: number; total: number };
+  tour?: { step: number; total: number; onNext: () => void; onStop: () => void };
 }) {
   const [station, setStation] = useState<StationId | null>(null),
     [details, setDetails] = useState<ProjectDetails | null>(null),
@@ -171,6 +176,33 @@ export default function ProjectRoom({
           <span>Share room</span>
         </button>
       </header>
+      <section
+        className="room-tour"
+        inert={station !== null}
+        aria-label={tour ? 'Guided tour' : 'Exploration passport'}
+      >
+        {tour && <GuideCharacter />}
+        <div>
+          <strong>
+            {tour ? `Pip’s tour · Room ${tour.step} of ${tour.total}` : 'Room stamp collected'}
+          </strong>
+          <p>
+            {tour
+              ? 'Take a look around. Open any station, then continue when you’re ready.'
+              : `${stamps.count} / ${stamps.total} passport stamps · Visit every room to unlock your souvenir.`}
+          </p>
+        </div>
+        {tour && (
+          <>
+            <button className="tour-stop" onClick={tour.onStop}>
+              Leave tour
+            </button>
+            <button className="tour-next" onClick={tour.onNext}>
+              {tour.step === tour.total ? 'Finish tour' : 'Next room →'}
+            </button>
+          </>
+        )}
+      </section>
       <div className={'room-layout' + (station ? ' reading' : '')}>
         <div className="room-world-column" inert={station !== null}>
           <div

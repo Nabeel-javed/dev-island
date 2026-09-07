@@ -31,6 +31,9 @@ import {
   validUsername,
 } from '@/lib/island';
 import { useController } from './use-controller';
+import { usePassport } from './use-passport';
+import IslandGuide from './island-guide';
+import ExplorerPassport from './explorer-passport';
 import { projectKey } from '@/lib/project';
 const ProjectRoom = dynamic(() => import('./project-room'), { ssr: false });
 const Pixel = dynamic(() => import('./pixel-island'), { ssr: false });
@@ -75,30 +78,41 @@ export default function IslandApp({
   const [selected, setSelected] = useState<number | null>(null),
     [ready, setReady] = useState(false),
     [reducedMotion, setReducedMotion] = useState(false),
-    [visited, setVisited] = useState<number[]>([]),
+    [guideOpen, setGuideOpen] = useState(false),
+    [tourStep, setTourStep] = useState<number | null>(null),
     [toast, setToast] = useState(''),
     [username, setUsername] = useState(''),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(false),
     [about, setAbout] = useState(false);
+  const { visited, collect, persistent } = usePassport(island);
+  const tourTotal = Math.min(3, island.projects.length);
   const stage = useRef<HTMLDivElement>(null),
     dialog = useRef<HTMLDialogElement>(null),
     timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
   const select = useCallback(
-    (i: number) => {
+    (i: number, replace = false) => {
       const p = island.projects[i];
       if (!p) return;
       const url = new URL(window.location.href);
       url.searchParams.set('project', projectKey(p.owner, p.name));
-      window.history.pushState({ ...window.history.state, devIslandRoom: true }, '', url);
+      window.history[replace ? 'replaceState' : 'pushState'](
+        { ...window.history.state, devIslandRoom: true },
+        '',
+        url,
+      );
       setSelected(i);
-      setVisited((v) => (v.includes(i) ? v : [...v, i]));
+      collect(i);
     },
-    [island.projects],
+    [island.projects, collect],
   );
-  const controller = useController(island.projects.length, select, selected !== null || about);
+  const controller = useController(
+    island.projects.length,
+    select,
+    selected !== null || about || guideOpen,
+  );
   const onReady = useCallback(() => setReady(true), []);
   const restoreDoorway = useCallback(() => {
     const i = selectedRef.current;
@@ -109,6 +123,7 @@ export default function IslandApp({
     }
   }, [controller]);
   const exitRoom = useCallback(() => {
+    setTourStep(null);
     restoreDoorway();
     if (window.history.state?.devIslandRoom) window.history.back();
     else {
@@ -120,6 +135,7 @@ export default function IslandApp({
   }, [restoreDoorway]);
   useEffect(() => {
     const sync = () => {
+      setTourStep(null);
       const url = new URL(window.location.href),
         key = url.searchParams.get('project');
       const index = key
@@ -127,7 +143,7 @@ export default function IslandApp({
         : -1;
       if (index >= 0) {
         setSelected(index);
-        setVisited((v) => (v.includes(index) ? v : [...v, index]));
+        collect(index);
       } else {
         restoreDoorway();
         setSelected(null);
@@ -141,7 +157,7 @@ export default function IslandApp({
     sync();
     window.addEventListener('popstate', sync);
     return () => window.removeEventListener('popstate', sync);
-  }, [island.projects, restoreDoorway]);
+  }, [island.projects, restoreDoorway, collect]);
   const hadRoom = useRef(false);
   useEffect(() => {
     if (selected !== null) hadRoom.current = true;
@@ -270,6 +286,23 @@ export default function IslandApp({
         avatar={avatar}
         reducedMotion={reducedMotion}
         onExit={exitRoom}
+        stamps={{ count: visited.length, total: island.projects.length }}
+        tour={
+          tourStep === null
+            ? undefined
+            : {
+                step: tourStep + 1,
+                total: tourTotal,
+                onNext: () => {
+                  if (tourStep + 1 >= tourTotal) exitRoom();
+                  else {
+                    setTourStep(tourStep + 1);
+                    select(tourStep + 1, true);
+                  }
+                },
+                onStop: () => setTourStep(null),
+              }
+        }
       />
     );
   return (
@@ -426,6 +459,14 @@ export default function IslandApp({
                     <span className="spinner" /> Growing your little world…
                   </div>
                 )}
+                <IslandGuide
+                  island={island}
+                  onOpenChange={setGuideOpen}
+                  onStart={() => {
+                    setTourStep(0);
+                    select(0);
+                  }}
+                />
                 <div className="world-bottomline">
                   <span className="world-hint">
                     <span className="hint-dot" /> Click a building to discover a project
@@ -543,6 +584,14 @@ export default function IslandApp({
                   <span>contributions</span>
                 </div>
               </div>
+              <ExplorerPassport
+                island={island}
+                visited={visited}
+                persistent={persistent}
+                palette={palette}
+                onSelect={select}
+                onNotify={notify}
+              />
               <div className="customize">
                 <div className="section-label">
                   Make yourself at home <Sparkles size={13} />
