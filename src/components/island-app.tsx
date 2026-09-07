@@ -46,6 +46,7 @@ import GraphicsSettings, { GraphicsProvider, useGraphics } from './graphics-sett
 import { useController } from './use-controller';
 import { useEntrance } from './use-entrance';
 import type { DoorwayFrame } from '@/lib/doorway';
+import ProjectFinder from './project-finder';
 import ProjectPeek from './project-peek';
 import { usePassport } from './use-passport';
 import IslandGuide from './island-guide';
@@ -102,6 +103,7 @@ function IslandExperience({
   const [selected, setSelected] = useState<number | null>(null),
     [ready, setReady] = useState(false),
     [systemReducedMotion, setReducedMotion] = useState(false),
+    [finderOpen, setFinderOpen] = useState(false),
     [guideOpen, setGuideOpen] = useState(false),
     [cardOpen, setCardOpen] = useState(false),
     [trailerOpen, setTrailerOpen] = useState(false),
@@ -145,6 +147,7 @@ function IslandExperience({
     selected !== null ||
       about ||
       guideOpen ||
+      finderOpen ||
       cardOpen ||
       trailerOpen ||
       editorOpen ||
@@ -168,8 +171,9 @@ function IslandExperience({
     if (!entryFrame.current) setPeek(index);
   }, []);
   useEffect(() => {
-    if (about || guideOpen || cardOpen || trailerOpen || editorOpen) entrance.cancel();
-  }, [about, guideOpen, cardOpen, trailerOpen, editorOpen, entrance.cancel]);
+    if (about || guideOpen || finderOpen || cardOpen || trailerOpen || editorOpen)
+      entrance.cancel();
+  }, [about, guideOpen, finderOpen, cardOpen, trailerOpen, editorOpen, entrance.cancel]);
   useEffect(() => {
     entrance.cancel();
   }, [style, entrance.cancel]);
@@ -518,6 +522,12 @@ function IslandExperience({
                     {style === 'pixel' ? 'THE PIXEL ARCHIPELAGO' : 'A WORLD IN MINIATURE'}
                   </span>
                   <div className="world-top-actions">
+                    <ProjectFinder
+                      projects={island.projects}
+                      visited={visited}
+                      onSelect={select}
+                      onOpenChange={setFinderOpen}
+                    />
                     <button
                       className="lighting-icon"
                       aria-label={
