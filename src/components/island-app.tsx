@@ -20,6 +20,8 @@ import {
   Layers3,
   Leaf,
   MapPin,
+  Maximize2,
+  Minimize2,
   Moon,
   Share2,
   Sparkles,
@@ -93,6 +95,7 @@ function IslandExperience({
     [palette, setPalette] = useState<PaletteId>(initialAppearance.palette),
     [lighting, setLighting] = useState<LightingId>(initialAppearance.lighting),
     [avatar, setAvatar] = useState<AvatarId>(initialAppearance.avatar);
+  const [expanded, setExpanded] = useState(false);
   const [peek, setPeek] = useState<number | null>(null);
   const entryFrame = useRef<DoorwayFrame | null>(null);
   const entryStart = useRef<(index: number) => void>(() => {});
@@ -215,6 +218,19 @@ function IslandExperience({
     window.addEventListener('popstate', sync);
     return () => window.removeEventListener('popstate', sync);
   }, [island.projects, restoreDoorway, collect]);
+  useEffect(() => {
+    if (!expanded || selected !== null) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.defaultPrevented) setExpanded(false);
+    };
+    window.addEventListener('keydown', escape);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener('keydown', escape);
+    };
+  }, [expanded, selected]);
   const hadRoom = useRef(false);
   useEffect(() => {
     if (selected !== null) hadRoom.current = true;
@@ -482,9 +498,13 @@ function IslandExperience({
             </div>
           </div>
           <div className="island-layout">
-            <div className="world-column">
+            <div className={'world-column' + (expanded ? ' has-expanded-world' : '')}>
               <div
-                className={'world-stage' + (lighting === 'night' ? ' world-night' : '')}
+                className={
+                  'world-stage' +
+                  (lighting === 'night' ? ' world-night' : '') +
+                  (expanded ? ' world-expanded' : '')
+                }
                 style={{ background: scenePalette(palette, lighting).water }}
                 ref={stage}
                 data-game-controls
@@ -498,6 +518,17 @@ function IslandExperience({
                     {style === 'pixel' ? 'THE PIXEL ARCHIPELAGO' : 'A WORLD IN MINIATURE'}
                   </span>
                   <div className="world-top-actions">
+                    <button
+                      className="lighting-icon"
+                      aria-label={
+                        expanded ? 'Exit full-window island' : 'Expand island to full window'
+                      }
+                      title={expanded ? 'Exit expanded view' : 'Expand island'}
+                      aria-pressed={expanded}
+                      onClick={() => setExpanded((v) => !v)}
+                    >
+                      {expanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                    </button>
                     <GraphicsSettings />
                     <span className="coordinate">
                       {style === 'pixel' ? '01' : '02'} / EXPLORATIONS
@@ -576,7 +607,10 @@ function IslandExperience({
                 />
                 <div className="world-bottomline">
                   <span className="world-hint">
-                    <span className="hint-dot" /> Click a building to discover a project
+                    <span className="hint-dot" />{' '}
+                    {style === '3d'
+                      ? 'Drag to orbit · Click a building to explore'
+                      : 'Click a building to discover a project'}
                   </span>
                   <button
                     className="postcard-button"

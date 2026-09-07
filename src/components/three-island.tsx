@@ -1,7 +1,7 @@
 'use client';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
-import { useEffect, useMemo, useRef, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import * as THREE from 'three';
 import { AVATARS, PALETTES, PLOTS, TREES, seed, type Day } from '@/lib/island';
 import type { SceneProps as BaseSceneProps } from './pixel-island';
@@ -14,7 +14,8 @@ import RoomMaterial from './room-material';
 import SceneLighting, { GraphicsPerformance } from './scene-lighting';
 import { useGraphics, GRAPHICS } from './graphics-settings';
 import CoastalLife from './coastal-life';
-import { trailerFrame } from '@/lib/trailer';
+import IslandCamera, { type CameraCommand } from './island-camera';
+import { RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
 type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
 const V = (x: number, y: number, z: number): [number, number, number] => [x, y, z];
 function Box({
@@ -114,6 +115,7 @@ function House({ index, props }: { index: number; props: SceneProps }) {
       position={[p.x, 0.22, p.y]}
       onClick={(e) => {
         e.stopPropagation();
+        if (e.delta > 5) return;
         props.onSelect(index);
       }}
       onPointerOver={() => {
@@ -338,38 +340,6 @@ export function Explorer({
     </group>
   );
 }
-function FitCamera({
-  cinematic,
-  count,
-  entry,
-}: {
-  cinematic?: RefObject<number>;
-  count: number;
-  entry?: SceneProps['entry'];
-}) {
-  const { camera, size } = useThree();
-  useFrame(() => {
-    if (!(camera instanceof THREE.OrthographicCamera)) return;
-    const zoom = Math.min(size.width / 25.5, size.height / 22);
-    if (cinematic) {
-      const frame = trailerFrame(cinematic.current, count);
-      camera.position.set(...frame.position);
-      camera.lookAt(...frame.target);
-      camera.zoom = zoom * frame.zoom;
-    } else {
-      const frame = entry?.current;
-      const plot = frame ? PLOTS[frame.index] : undefined;
-      const focus = frame?.focus ?? 0;
-      const x = (plot?.x ?? 0) * focus * 0.75;
-      const z = 1 + ((plot?.y ?? 1) - 1) * focus * 0.75;
-      camera.position.set(14 + x, 18, 21 + z);
-      camera.lookAt(x, focus * 0.5, z);
-      camera.zoom = zoom * (1 + focus * 0.32);
-    }
-    camera.updateProjectionMatrix();
-  });
-  return null;
-}
 function Boat({ motion }: { motion: boolean }) {
   const ref = useRef<THREE.Group>(null);
   const sail = useRef<THREE.Mesh>(null);
@@ -433,7 +403,7 @@ function Garden({ days }: { days: Day[] }) {
     </instancedMesh>
   );
 }
-function World(props: SceneProps) {
+function World(props: SceneProps & { cameraCommand: CameraCommand }) {
   const { level } = useGraphics();
   const p = scenePalette(props.palette, props.lighting),
     night = props.lighting === 'night';
@@ -476,7 +446,10 @@ function World(props: SceneProps) {
         shadow-radius={3}
       />
       {night && <NightAtmosphere reducedMotion={props.reducedMotion} />}
-      <FitCamera
+      <IslandCamera
+        command={props.cameraCommand}
+        controller={props.controller}
+        reducedMotion={props.reducedMotion}
         cinematic={props.cinematic}
         count={props.island.projects.length}
         entry={props.entry}
@@ -574,8 +547,15 @@ function GraphicsFallback({ onReady }: { onReady: () => void }) {
 }
 export default function ThreeIsland(props: SceneProps) {
   const { level } = useGraphics();
+  const [command, setCommand] = useState<CameraCommand>({ action: 'reset', sequence: 0 });
+  const cameraAction = (action: CameraCommand['action']) =>
+    setCommand((c) => ({ action, sequence: c.sequence + 1 }));
   return (
-    <div className="scene-render three-render" role="img" aria-label="Playable miniature 3D island">
+    <div
+      className="scene-render three-render"
+      role="group"
+      aria-label="Playable miniature 3D island"
+    >
       <Canvas
         shadows
         orthographic
@@ -584,8 +564,44 @@ export default function ThreeIsland(props: SceneProps) {
         gl={{ antialias: true, preserveDrawingBuffer: true }}
         fallback={<GraphicsFallback onReady={props.onReady} />}
       >
-        <World {...props} />
+        <World {...props} cameraCommand={command} />
       </Canvas>
+      {!props.cinematic && (
+        <div
+          className="island-camera-tools"
+          role="group"
+          aria-label="Island camera"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <button
+            aria-label="Rotate island left"
+            title="Rotate left"
+            onClick={() => cameraAction('left')}
+          >
+            <RotateCcw size={17} />
+          </button>
+          <button
+            aria-label="Rotate island right"
+            title="Rotate right"
+            onClick={() => cameraAction('right')}
+          >
+            <RotateCw size={17} />
+          </button>
+          <button aria-label="Zoom into island" title="Zoom in" onClick={() => cameraAction('in')}>
+            <ZoomIn size={17} />
+          </button>
+          <button
+            aria-label="Zoom out of island"
+            title="Zoom out"
+            onClick={() => cameraAction('out')}
+          >
+            <ZoomOut size={17} />
+          </button>
+          <button onClick={() => cameraAction('reset')} title="Reset camera">
+            Reset
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import { cameraMovement } from '@/lib/island-camera';
 import { advance, PLOTS } from '@/lib/island';
 export type Controller = {
   x: number;
@@ -9,6 +10,7 @@ export type Controller = {
   moving: boolean;
   paused: boolean;
   scripted?: boolean;
+  cameraYaw?: number;
   step: (dt: number) => void;
   keys: Set<string>;
 };
@@ -48,12 +50,13 @@ export function useController(
       if (!c.scripted) c.moving = false;
       return;
     }
-    const dx =
+    const inputX =
       Number(c.keys.has('d') || c.keys.has('arrowright')) -
       Number(c.keys.has('a') || c.keys.has('arrowleft'));
-    const dy =
+    const inputY =
       Number(c.keys.has('s') || c.keys.has('arrowdown')) -
       Number(c.keys.has('w') || c.keys.has('arrowup'));
+    const { dx, dy } = cameraMovement(inputX, inputY, c.cameraYaw);
     const p = domainRef.current
       ? domainRef.current.advance(c, dx, dy, dt)
       : advance(c, dx, dy, dt, count);
