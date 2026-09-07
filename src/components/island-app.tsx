@@ -769,7 +769,6 @@ export default function IslandApp({
           <div className="projects-heading">
             <div>
               <span className="eyebrow">BUILT WITH CURIOSITY</span>
-              <h2>Every building has a story.</h2>
             </div>
             <span>
               {island.projects.length} places to explore <ChevronRight size={15} />
