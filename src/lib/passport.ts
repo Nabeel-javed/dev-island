@@ -1,6 +1,11 @@
 import type { Project } from './island';
-import { projectKey } from './project';
-export function restoreStamps(raw: string | null, projects: Project[]): string[] {
+import { projectKey, validRepository } from './project';
+import { validUsername } from './island';
+export function restoreStamps(
+  raw: string | null,
+  projects: Project[],
+  preserveHidden = false,
+): string[] {
   try {
     const data = JSON.parse(raw || 'null');
     if (data?.version !== 1 || !Array.isArray(data.stamps)) return [];
@@ -12,7 +17,15 @@ export function restoreStamps(raw: string | null, projects: Project[]): string[]
           .filter((s: unknown): s is string => typeof s === 'string')
           .map((s: string) => s.toLowerCase()),
       ),
-    ].filter((s) => allowed.has(s));
+    ].filter((s) => {
+      const parts = s.split('/');
+      return (
+        parts.length === 2 &&
+        validUsername(parts[0]) &&
+        validRepository(parts[1]) &&
+        (preserveHidden || allowed.has(s))
+      );
+    });
   } catch {
     return [];
   }

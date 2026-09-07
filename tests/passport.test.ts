@@ -31,3 +31,12 @@ test('an empty island cannot award a completion souvenir', () => {
   assert.equal(passportComplete(5, 6), false);
   assert.equal(passportComplete(6, 6), true);
 });
+
+test('custom layouts preserve stamps for hidden rooms without accepting malformed identities', () => {
+  const saved = JSON.stringify({
+    version: 1,
+    stamps: ['demo/moss-ui', 'demo/dotfiles', '../../invalid'],
+  });
+  const restored = restoreStamps(saved, [], true);
+  assert.deepEqual(restored, ['demo/moss-ui', 'demo/dotfiles']);
+});

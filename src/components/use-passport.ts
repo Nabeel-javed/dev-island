@@ -10,7 +10,7 @@ export function usePassport(island: Island) {
   const storageKey = 'dev-island:passport:v1:' + island.login.toLowerCase();
   useEffect(() => {
     try {
-      setStamps(restoreStamps(localStorage.getItem(storageKey), island.projects));
+      setStamps(restoreStamps(localStorage.getItem(storageKey), island.projects, true));
       setPersistent(true);
     } catch {
       setStamps([]);
