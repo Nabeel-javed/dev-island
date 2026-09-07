@@ -15,6 +15,7 @@ import RoomFurnishings from './room-furnishings';
 import RoomActivity from './room-activity';
 import RoomMaterial, { type Finish } from './room-material';
 import RoomWindow from './room-window';
+import RoomArchitecture from './room-architecture';
 import type { RoomSceneProps } from './room-scene-types';
 function Box({
   at,
@@ -149,6 +150,7 @@ function Room(props: RoomSceneProps & CameraProps) {
       <Camera {...props} />
       <RoomActivity reducedMotion={props.reducedMotion} night={night} />
       <RoomWindow reducedMotion={props.reducedMotion} night={night} />
+      <RoomArchitecture night={night} />
       <ambientLight intensity={night ? 0.55 : 0.8} />
       <hemisphereLight args={[night ? '#a6bce9' : '#fff3da', '#798b72', 0.65]} />
       <RoomAtmosphere reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
