@@ -1,17 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  BookOpen,
-  Code2,
-  Monitor,
-  Share2,
-  Sparkles,
-  Star,
-  X,
-} from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Share2, Star, X } from 'lucide-react';
 import { PALETTES, type Project, type AvatarId, type PaletteId, type StyleId } from '@/lib/island';
 import type { ProjectDetails } from '@/lib/project';
 import { advanceRoom, nearestRoomTarget, ROOM_SPAWN, STATIONS, type StationId } from '@/lib/room';
@@ -28,7 +18,6 @@ const ThreeRoom = dynamic(() => import('./three-room'), {
   loading: () => <p className="room-graphics-note">Opening the room…</p>,
 });
 const domain = { advance: advanceRoom, nearest: nearestRoomTarget };
-const icons = [Sparkles, BookOpen, Code2, Monitor];
 class RoomBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
@@ -37,7 +26,7 @@ class RoomBoundary extends Component<{ children: ReactNode }, { failed: boolean 
   render() {
     return this.state.failed ? (
       <p className="room-graphics-note">
-        The room’s graphics couldn’t load. All four stations are available below.
+        The room’s graphics couldn’t load. Reload the page to try again, or return to the island.
       </p>
     ) : (
       this.props.children
@@ -155,7 +144,6 @@ export default function ProjectRoom({
   const languageTotal = details?.languages.reduce((n, l) => n + l.bytes, 0) || 1;
   const building = buildingFor(project);
   const isDemo = project.owner === 'demo';
-  const summary = details?.description || project.description;
   const readme = details?.readme;
   return (
     <main
@@ -213,15 +201,6 @@ export default function ProjectRoom({
             </button>
           </>
         )}
-      </section>
-      <section className="room-story-intro" inert={station !== null}>
-        <div>
-          <span className="eyebrow">WHAT LIVES HERE</span>
-          <p>{summary || 'Step inside to discover the project.'}</p>
-        </div>
-        <button className="studio-secondary" onClick={() => setStation('overview')}>
-          Read the project story <ArrowUpRight size={15} />
-        </button>
       </section>
       <div className={'room-layout' + (station ? ' reading' : '')}>
         <div className="room-world-column" inert={station !== null}>
@@ -314,25 +293,10 @@ export default function ProjectRoom({
                   <ArrowUpRight size={15} />
                 </button>
               ) : (
-                <span>Walk up to an object, or choose a station below.</span>
+                <span>Walk up to an object and press Enter to explore it.</span>
               )}
             </div>
           </div>
-          <nav className="room-stations" aria-label="Project stations">
-            {STATIONS.map((s, i) => {
-              const Icon = icons[i];
-              return (
-                <button key={s.id} onClick={() => setStation(s.id)} aria-pressed={station === s.id}>
-                  <Icon size={21} />
-                  <span>
-                    <strong>{s.short}</strong>
-                    <small>{s.caption}</small>
-                  </span>
-                  <ArrowUpRight size={15} />
-                </button>
-              );
-            })}
-          </nav>
           <div className="room-footer">
             <span>
               <kbd>WASD</kbd> / arrows to walk · <kbd>Enter</kbd> or <kbd>E</kbd> to discover
