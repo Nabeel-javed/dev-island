@@ -71,7 +71,7 @@ README display is capped at 200 KiB with a GitHub link for larger documents. Mis
 - **Next.js / React / TypeScript:** application shell, shareable pages, server API, social images.
 - **Phaser:** original pixel artwork, animation and hit testing.
 - **Three.js / React Three Fiber:** original low-poly models, orthographic camera and instanced contribution garden.
-- **Rooms:** Canvas 2D pixel interiors and primitive 3D interiors share furniture locations, collision, interaction zones, and repository-based decoration. Only the current scene is mounted.
+- **Rooms:** Canvas 2D pixel interiors and primitive 3D interiors share furniture locations, collision, interaction zones, and repository-based decoration. Only the current exploration scene is mounted; opening the trailer mounts a separate 3D preview until it is closed.
 - Shared model, project selection, appearance parsing, movement and collision rules feed both renderers. Only the selected renderer is mounted.
 - All artwork is produced locally from code. No runtime AI calls, externally hosted fonts, or purchased asset packs.
 
@@ -103,8 +103,18 @@ Both visual previews are implemented. The next product decision is choosing the 
 
 Remaining rollout work: decide whether to retain both styles; configure a public-data GitHub token, shared cache and `SITE_URL`; verify GraphQL and Redis with those credentials; add deployment-level distributed rate limits and a spending cap; check Safari and real mobile hardware; then record the launch demo. No cloud services or paid plans are created by the application.
 
-Accounts, multiplayer, editors, payments and leaderboards are outside this version. See [asset credits](docs/ASSETS.md). Code and original artwork are MIT licensed.
+Accounts, multiplayer, payments and leaderboards are outside this version. See [asset credits](docs/ASSETS.md). Code and original artwork are MIT licensed.
 
 ### Island guide and exploration passport
 
 Meet Pip on the island to start a self-paced tour of up to three featured rooms. Leave the tour at any time. Every room visit collects a passport stamp, saved per island in your browser. Visit all featured rooms to unlock a downloadable PNG souvenir and a link to create your own island. Progress follows repository identities even if buildings are reordered.
+
+### Profile cards, trailers and custom buildings
+
+- **Add island to GitHub:** previews a 1200 × 630 illustrated PNG card with current building names and palette. Copy the generated Markdown into your profile README. The image links to the current island appearance and custom layout; it does not publish to GitHub automatically.
+- **Make an island trailer:** opt-in 12-second 3D camera sequence highlighting up to three projects, with a 1280 × 720 silent video export. MP4 is preferred when supported; WebM is the fallback and may need conversion for a social platform. Preview and recording start only on a button press. Closing, stopping, or hiding the tab cancels active recording and releases capture tracks; blob URLs are released when replaced or closed. This records the app canvas without requesting a camera or microphone.
+- **Arrange island buildings:** reorder or remove featured projects, restore hidden defaults, add another public repository owned by the profile, and write a welcome message of up to 240 characters. Apply reloads into a shareable custom view. Restore defaults removes the customization parameters. Anyone can arrange a link; custom introductions are explicitly distinguished from the GitHub profile bio.
+- Custom links use `projects=owner/repo,owner/repo` (up to six) and optional `intro=...`. An empty project list is supported. New projects must belong to the displayed profile; existing featured projects remain eligible. The server validates links and loads only public project details. These views do not change the profile or its repositories.
+- `/api/card?username=...&palette=...&projects=...` provides the README card. The endpoint accepts the same customization parameters as the island page. GitHub caches README images, so project-data updates may not appear immediately.
+
+Browser export APIs: [canvas captureStream](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream), [MediaRecorder format detection](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/isTypeSupported_static).

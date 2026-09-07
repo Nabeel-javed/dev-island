@@ -5,7 +5,10 @@ All island artwork is original and created in this repository:
 - Pixel village: `src/lib/pixel-art.ts`, drawn using Canvas 2D and displayed through Phaser.
 - Miniature island: `src/components/three-island.tsx`, built from primitive geometry and a custom roof shape.
 - Logo, favicon and social illustration: inline SVG and authored shapes.
-- Character previews: CSS shapes.
+- Character previews and Pip: CSS shapes.
+- README cards: authored social-card shapes with public project labels.
+- Trailers: the original 3D island rendered with an authored camera path and text captions; silent, with no external music or footage.
+- Passport souvenirs: original Canvas 2D stamp illustrations.
 - Project rooms: original Canvas 2D furnishings and Three.js primitive models, with deterministic wall art and books.
 - `public/room-sample.svg`: original fictional interface illustration for the sample gallery.
 

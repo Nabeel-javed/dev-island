@@ -52,3 +52,12 @@ The initial deployment uses the existing no-token GitHub REST mode and per-insta
 - Brave native UI: Pip introduction, three-room tour, successive room URLs, Finish tour returns outside, 3/6 stamps survive reload, all six stamps unlock completion reward. Final room checked in Miniature 3D; screenshot confirms room and passport layouts.
 - Souvenir export reached the native Save dialog with the expected passport filename. Save was disabled in automation; disk download was not verified and the dialog was cancelled.
 - Mobile layout rules are implemented; this feature pass did not repeat hardware/mobile or storage-denied browser tests.
+
+### README cards, trailers and custom layouts — 2026-09-07
+
+- 35 unit tests passed. Added coverage for Markdown appearance/customization links, camera continuity and empty islands, recording-format selection, custom project ownership/length/identity validation, layout ordering and canonical-data preservation, and retaining passport stamps when a custom view hides buildings.
+- TypeScript, production build and repository formatting checks passed.
+- Local HTTP: custom sample page responds 200 with the selected layout and introduction serialized; custom PNG responds 200 with a valid PNG signature; disallowed repository owners and malformed usernames return 400 from the card endpoint.
+- Rendered and visually inspected default six-building and custom two-building PNG cards, including project labels and palette changes.
+- **Browser QA limitation:** native Brave inspection was interrupted by user activity, then the native pipe failed to start even after resetting the connection. The in-app browser connection also failed with its missing `classic-level.mjs` dependency; no alternate browser providers were available. New dialog interactions, actual video encoding/playback/download and mobile layouts have not been verified end to end in this feature pass. The earlier guide/room checks above do not validate these new dialogs.
+- Video availability is detected at runtime and exported formats are labeled. No claim of universal social-platform upload compatibility; WebM may require conversion. Capture cleanup, cancellation, and recording errors are handled in code; actual browser behavior remains part of the outstanding QA above.
