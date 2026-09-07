@@ -1,4 +1,4 @@
-import { BUILDINGS, BUILDING_IDS, buildingFor, scenePalette, type LightingId } from './buildings';
+import { scenePalette, type LightingId } from './buildings';
 import { ImageResponse } from 'next/og';
 import { PaletteId, type Island, type Project } from './island';
 import { IslandCardScene } from './island-card-scene';
@@ -10,8 +10,7 @@ export function socialCard(
   lighting: LightingId = 'day',
   room?: Project,
 ) {
-  const p = scenePalette(palette, lighting),
-    night = lighting === 'night';
+  const p = scenePalette(palette, lighting);
   return new ImageResponse(
     <div
       style={{
