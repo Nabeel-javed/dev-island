@@ -13,15 +13,19 @@ import { Explorer } from './three-island';
 import RoomAtmosphere from './room-atmosphere';
 import RoomFurnishings from './room-furnishings';
 import RoomActivity from './room-activity';
+import RoomMaterial, { type Finish } from './room-material';
+import RoomWindow from './room-window';
 import type { RoomSceneProps } from './room-scene-types';
 function Box({
   at,
   size,
   color,
+  finish,
 }: {
   at: [number, number, number];
   size: [number, number, number];
   color: string;
+  finish?: Finish;
 }) {
   if (Math.min(...size) >= 0.1)
     return (
@@ -33,13 +37,21 @@ function Box({
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color={color} roughness={0.8} />
+        {finish ? (
+          <RoomMaterial color={color} finish={finish} />
+        ) : (
+          <meshStandardMaterial color={color} roughness={0.8} />
+        )}
       </RoundedBox>
     );
   return (
     <mesh position={at} castShadow receiveShadow>
       <boxGeometry args={size} />
-      <meshStandardMaterial color={color} roughness={0.9} />
+      {finish ? (
+        <RoomMaterial color={color} finish={finish} />
+      ) : (
+        <meshStandardMaterial color={color} roughness={0.9} />
+      )}
     </mesh>
   );
 }
@@ -136,6 +148,7 @@ function Room(props: RoomSceneProps & CameraProps) {
       <color attach="background" args={[night ? '#20333a' : theme.wall]} />
       <Camera {...props} />
       <RoomActivity reducedMotion={props.reducedMotion} night={night} />
+      <RoomWindow reducedMotion={props.reducedMotion} night={night} />
       <ambientLight intensity={night ? 0.55 : 0.8} />
       <hemisphereLight args={[night ? '#a6bce9' : '#fff3da', '#798b72', 0.65]} />
       <RoomAtmosphere reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
@@ -155,12 +168,12 @@ function Room(props: RoomSceneProps & CameraProps) {
         shadow-radius={3}
       />
       <Box at={[0, 0, 0]} size={[12.7, 0.45, 9.8]} color="#bba07a" />
-      <Box at={[0, 0.24, 0]} size={[12.5, 0.04, 9.6]} color={theme.floor} />
+      <Box at={[0, 0.24, 0]} size={[12.5, 0.04, 9.6]} color={theme.floor} finish="wood" />
       {Array.from({ length: 13 }, (_, i) => (
         <Box key={i} at={[-6 + i, 0.269, 0]} size={[0.022, 0.006, 9.4]} color="#bfaa87" />
       ))}
-      <Box at={[0, 1.7, -4.88]} size={[12.7, 3.1, 0.3]} color={theme.wall} />
-      <Box at={[-6.38, 1.7, 0]} size={[0.3, 3.1, 9.8]} color={theme.wall} />
+      <Box at={[0, 1.7, -4.88]} size={[12.7, 3.1, 0.3]} color={theme.wall} finish="plaster" />
+      <Box at={[-6.38, 1.7, 0]} size={[0.3, 3.1, 9.8]} color={theme.wall} finish="plaster" />
       <Box at={[0, 0.45, -4.67]} size={[12.5, 0.3, 0.12]} color="#b79b76" />
       <Box at={[-6.17, 0.45, 0]} size={[0.12, 0.3, 9.6]} color="#b79b76" />
       <Box at={[0, 3.3, -4.8]} size={[12.8, 0.12, 0.24]} color={colors.accent} />
@@ -173,7 +186,7 @@ function Room(props: RoomSceneProps & CameraProps) {
       />
       <Box at={[0, 0.279, 0.7]} size={[4.6, 0.025, 3.4]} color={colors.accent} />
       <Box at={[0, 0.294, 0.7]} size={[4.25, 0.008, 3.05]} color={colors.light} />
-      <Box at={[0, 0.3, 0.7]} size={[3.9, 0.008, 2.7]} color={colors.grass} />
+      <Box at={[0, 0.3, 0.7]} size={[3.9, 0.008, 2.7]} color={colors.grass} finish="fabric" />
       <Box at={[4.6, 2.15, -4.65]} size={[1.7, 1.5, 0.12]} color="#a58a65" />
       <Box at={[4.6, 2.15, -4.57]} size={[1.48, 1.28, 0.04]} color={colors.water} />
       <Box at={[4.6, 2.15, -4.5]} size={[0.07, 1.35, 0.05]} color="#fff0d1" />
@@ -256,7 +269,12 @@ function Room(props: RoomSceneProps & CameraProps) {
             </>
           ) : (
             <>
-              <Box at={[0, 0.95, 0]} size={[s.width, 0.16, s.depth]} color="#c1a176" />
+              <Box
+                at={[0, 0.95, 0]}
+                size={[s.width, 0.16, s.depth]}
+                color="#c1a176"
+                finish="wood"
+              />
               {[-1, 1].flatMap((x) =>
                 [-1, 1].map((z) => (
                   <Box

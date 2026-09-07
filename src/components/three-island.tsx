@@ -8,6 +8,7 @@ import type { SceneProps as BaseSceneProps } from './pixel-island';
 import { BUILDINGS, buildingFor, scenePalette } from '@/lib/buildings';
 import NightAtmosphere from './night-atmosphere';
 import IslandAtmosphere from './island-atmosphere';
+import ShaderWater from './shader-water';
 import { trailerFrame } from '@/lib/trailer';
 type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
 const V = (x: number, y: number, z: number): [number, number, number] => [x, y, z];
@@ -456,14 +457,7 @@ function World(props: SceneProps) {
         count={props.island.projects.length}
         entry={props.entry}
       />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]} receiveShadow>
-        <planeGeometry args={[200, 200]} />
-        <meshStandardMaterial color={p.water} roughness={0.8} />
-      </mesh>
-      <mesh position={[0, -0.53, 0]} scale={[1, 0.02, 0.72]}>
-        <cylinderGeometry args={[10.9, 10.9, 1, 80]} />
-        <meshStandardMaterial color={p.deep} />
-      </mesh>
+      <ShaderWater color={p.water} night={night} reducedMotion={props.reducedMotion} />
       <mesh position={[0, -0.44, 0]} scale={[1, 0.03, 0.72]}>
         <cylinderGeometry args={[10.45, 10.45, 1, 80]} />
         <meshStandardMaterial color="#d1e2cd" />

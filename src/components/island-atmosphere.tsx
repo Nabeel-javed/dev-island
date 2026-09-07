@@ -5,22 +5,6 @@ import * as THREE from 'three';
 import { PLOTS, type Island } from '@/lib/island';
 import { buildingFor } from '@/lib/buildings';
 
-function ShoreWave({ index, still, night }: { index: number; still: boolean; night: boolean }) {
-  const mesh = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (!mesh.current) return;
-    const phase = ((still ? 0 : clock.elapsedTime * 0.09) + index / 3) % 1;
-    mesh.current.scale.set(1 + phase * 0.16, 0.72 + phase * 0.12, 1);
-    (mesh.current.material as THREE.MeshBasicMaterial).opacity =
-      Math.sin(phase * Math.PI) * (night ? 0.12 : 0.3);
-  });
-  return (
-    <mesh ref={mesh} position={[0, -0.505 + index * 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[10.5, 10.55, 96]} />
-      <meshBasicMaterial color={night ? '#a8c9d5' : '#f4f3df'} transparent depthWrite={false} />
-    </mesh>
-  );
-}
 function Smoke({ x, z, still }: { x: number; z: number; still: boolean }) {
   const group = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
@@ -95,9 +79,6 @@ export default function IslandAtmosphere({
 }) {
   return (
     <>
-      {[0, 1, 2].map((i) => (
-        <ShoreWave key={i} index={i} still={reducedMotion} night={night} />
-      ))}
       {!night && [0, 1].map((i) => <Gull key={i} index={i} still={reducedMotion} />)}
       {island.projects.map((project, i) =>
         ['cottage', 'cafe'].includes(buildingFor(project)) ? (
