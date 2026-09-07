@@ -44,14 +44,28 @@ export function buildingFor(project: Pick<Project, 'owner' | 'name' | 'building'
 export type LightingId = 'day' | 'night';
 export function scenePalette(palette: PaletteId, lighting: LightingId = 'day') {
   const base = PALETTES[palette];
-  return lighting === 'night'
-    ? {
-        ...base,
-        water: '#172b40',
-        deep: '#0d1c2f',
-        grass: '#506d62',
-        light: '#698677',
-        tree: '#355f58',
-      }
-    : base;
+  const nights = {
+    lagoon: {
+      water: '#172b40',
+      deep: '#0d1c2f',
+      grass: '#506d62',
+      light: '#698677',
+      tree: '#355f58',
+    },
+    sunset: {
+      water: '#352b39',
+      deep: '#231d2b',
+      grass: '#736f61',
+      light: '#908372',
+      tree: '#635e58',
+    },
+    lavender: {
+      water: '#252c43',
+      deep: '#171e34',
+      grass: '#5e6d70',
+      light: '#7c8890',
+      tree: '#465f68',
+    },
+  };
+  return lighting === 'night' ? { ...base, ...nights[palette] } : base;
 }

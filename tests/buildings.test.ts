@@ -47,4 +47,25 @@ test('night is opt-in and preserves the chosen palette in day mode', () => {
   assert.equal(readAppearance(new URLSearchParams('lighting=invalid')).lighting, 'day');
   assert.notEqual(scenePalette('lagoon', 'night').water, scenePalette('lagoon', 'day').water);
   assert.notEqual(scenePalette('sunset', 'day').water, scenePalette('lagoon', 'day').water);
+  assert.notEqual(scenePalette('sunset', 'night').water, scenePalette('lagoon', 'night').water);
+});
+
+test('README card and island destinations retain the same building and night settings', async () => {
+  const { shareLinks } = await import('../src/lib/share');
+  const appearance = {
+    style: '3d' as const,
+    palette: 'lavender' as const,
+    avatar: 'sailor' as const,
+    lighting: 'night' as const,
+  };
+  const links = shareLinks(
+    'https://example.org',
+    DEMO,
+    appearance,
+    new URLSearchParams('buildings=demo/moss-ui:cafe'),
+  );
+  for (const link of [links.page, links.card]) {
+    assert.equal(new URL(link).searchParams.get('lighting'), 'night');
+    assert.equal(new URL(link).searchParams.get('buildings'), 'demo/moss-ui:cafe');
+  }
 });
