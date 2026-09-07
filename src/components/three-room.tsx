@@ -5,8 +5,7 @@ import { useGraphics, GRAPHICS } from './graphics-settings';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Html, RoundedBox, OrbitControls } from '@react-three/drei';
 import { useEffect, useState, useRef, type ComponentRef } from 'react';
-import { ZoomIn, ZoomOut, RotateCcw, MoveHorizontal, Scan, Footprints } from 'lucide-react';
-import { roomCameraFrame, ROOM_FOV } from '@/lib/room-camera';
+import { RotateCcw, MoveHorizontal } from 'lucide-react';
 import * as THREE from 'three';
 import { BUILDINGS, scenePalette } from '@/lib/buildings';
 import { roomDecor } from '@/lib/room-decor';
@@ -59,13 +58,12 @@ function Box({
     </mesh>
   );
 }
+const ROOM_VIEW_SCALE = 1.1;
 type CameraProps = Pick<RoomSceneProps, 'controller' | 'reducedMotion'> & {
-  zoom: number;
   angle: number;
-  overview: boolean;
   reset: number;
 };
-function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: CameraProps) {
+function Camera({ angle, reset, controller, reducedMotion }: CameraProps) {
   const { camera, size } = useThree();
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   const destination = useRef(new THREE.Vector3());
@@ -74,17 +72,11 @@ function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: Cam
   const arriving = useRef(true);
   useEffect(() => {
     if (!(camera instanceof THREE.PerspectiveCamera) || !controls.current) return;
-    camera.fov = overview ? ROOM_FOV : 58;
-    const frame = roomCameraFrame(size.width, size.height, zoom, angle);
-    if (overview) {
-      destination.current.set(...frame.position);
-      focus.current.set(...frame.target);
-    } else {
-      const c = controller.current;
-      focus.current.set(c.x * (size.width < 760 ? 0.85 : 0.4), 1.1, c.y * 0.25 - 1.3);
-      destination.current.set(Math.sin(angle) * 8, 3.3, Math.cos(angle) * 8);
-      destination.current.multiplyScalar(1 / zoom).add(focus.current);
-    }
+    camera.fov = 58;
+    const c = controller.current;
+    focus.current.set(c.x * (size.width < 760 ? 0.85 : 0.4), 1.1, c.y * 0.25 - 1.3);
+    destination.current.set(Math.sin(angle) * 8, 3.3, Math.cos(angle) * 8);
+    destination.current.multiplyScalar(1 / ROOM_VIEW_SCALE).add(focus.current);
     controls.current.target.copy(focus.current);
     camera.position
       .copy(destination.current)
@@ -93,7 +85,7 @@ function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: Cam
     camera.updateProjectionMatrix();
     arriving.current = !reducedMotion;
     controls.current.update();
-  }, [camera, size.width, size.height, zoom, angle, overview, reset, controller, reducedMotion]);
+  }, [camera, size.width, size.height, angle, reset, controller, reducedMotion]);
   useFrame((_, dt) => {
     const orbit = controls.current;
     if (!orbit) return;
@@ -101,7 +93,7 @@ function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: Cam
       camera.position.lerp(destination.current, 1 - Math.exp(-5 * dt));
       if (camera.position.distanceTo(destination.current) < 0.015) arriving.current = false;
       orbit.update();
-    } else if (!overview && controller.current.moving && !controller.current.paused) {
+    } else if (controller.current.moving && !controller.current.paused) {
       const c = controller.current;
       focus.current.set(c.x * (size.width < 760 ? 0.85 : 0.4), 1.1, c.y * 0.25 - 1.3);
       shift.current
@@ -118,10 +110,9 @@ function Camera({ zoom, angle, overview, reset, controller, reducedMotion }: Cam
       ref={controls}
       makeDefault
       enablePan={false}
+      enableZoom={false}
       enableDamping={!reducedMotion}
       dampingFactor={0.08}
-      minDistance={5}
-      maxDistance={overview ? 70 : 22}
       minPolarAngle={0.35}
       maxPolarAngle={1.38}
       minAzimuthAngle={-0.85}
@@ -363,15 +354,13 @@ function Room(props: RoomSceneProps & CameraProps) {
 }
 export default function ThreeRoom(props: RoomSceneProps) {
   const { level } = useGraphics();
-  const [zoom, setZoom] = useState(1),
-    [angle, setAngle] = useState(0),
-    [overview, setOverview] = useState(false),
+  const [angle, setAngle] = useState(0),
     [reset, setReset] = useState(0);
   return (
     <div className="three-room-stage">
       <Canvas
         shadows
-        camera={{ position: [11, 10, 16], fov: ROOM_FOV, near: 0.1, far: 250 }}
+        camera={{ position: [11, 10, 16], fov: 58, near: 0.1, far: 250 }}
         dpr={[1, GRAPHICS[level].dpr]}
         fallback={
           <p className="room-graphics-note">
@@ -379,37 +368,10 @@ export default function ThreeRoom(props: RoomSceneProps) {
           </p>
         }
       >
-        <Room {...props} zoom={zoom} angle={angle} overview={overview} reset={reset} />
+        <Room {...props} angle={angle} reset={reset} />
       </Canvas>
-      <div className="room-look-hint">Drag to look around · Scroll or pinch to zoom</div>
+      <div className="room-look-hint">Drag to look around</div>
       <div className="room-camera-tools" role="group" aria-label="Room camera">
-        <button
-          aria-label={overview ? 'Enter immersive room view' : 'Show whole room'}
-          title={overview ? 'Immersive view' : 'Whole room'}
-          aria-pressed={overview}
-          onClick={() => {
-            setOverview((v) => !v);
-            setZoom(1);
-          }}
-        >
-          {overview ? <Footprints size={17} /> : <Scan size={17} />}
-        </button>
-        <button
-          aria-label="Zoom into room"
-          title="Zoom in"
-          disabled={zoom >= 1.5}
-          onClick={() => setZoom((z) => Math.min(1.5, z + 0.15))}
-        >
-          <ZoomIn size={17} />
-        </button>
-        <button
-          aria-label="Zoom out of room"
-          title="Zoom out"
-          disabled={zoom <= 1}
-          onClick={() => setZoom((z) => Math.max(1, z - 0.15))}
-        >
-          <ZoomOut size={17} />
-        </button>
         <button
           aria-label="Change room viewing angle"
           title="Change viewing angle"
@@ -421,9 +383,7 @@ export default function ThreeRoom(props: RoomSceneProps) {
           aria-label="Reset room camera"
           title="Reset immersive view"
           onClick={() => {
-            setZoom(1);
             setAngle(0);
-            setOverview(false);
             setReset((n) => n + 1);
           }}
         >
