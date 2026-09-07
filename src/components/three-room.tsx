@@ -8,6 +8,7 @@ import { roomDecor } from '@/lib/room-decor';
 import { PALETTES, seed } from '@/lib/island';
 import { STATIONS } from '@/lib/room';
 import { Explorer } from './three-island';
+import RoomAtmosphere from './room-atmosphere';
 import type { RoomSceneProps } from './room-scene-types';
 function Box({
   at,
@@ -47,25 +48,12 @@ function Room(props: RoomSceneProps) {
   return (
     <>
       <Camera />
-      <ambientLight intensity={night ? 0.75 : 1.4} />
-      {night && (
-        <>
-          <pointLight
-            position={[2.1, 2.8, -2]}
-            color="#ffd79a"
-            intensity={18}
-            distance={11}
-            decay={2}
-          />
-          <mesh position={[2.1, 2.9, -4.4]}>
-            <coneGeometry args={[0.35, 0.4, 12]} />
-            <meshStandardMaterial color="#f6d79f" emissive="#ffcc79" emissiveIntensity={1} />
-          </mesh>
-        </>
-      )}
+      <ambientLight intensity={night ? 0.55 : 0.8} />
+      <hemisphereLight args={[night ? '#a6bce9' : '#fff3da', '#798b72', 0.65]} />
+      <RoomAtmosphere reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
       <directionalLight
         position={[2, 12, 7]}
-        intensity={night ? 0.9 : 2.1}
+        intensity={night ? 0.9 : 2.7}
         color={night ? '#becfeb' : '#fff3dc'}
         castShadow
         shadow-mapSize={[1024, 1024]}
@@ -74,6 +62,8 @@ function Room(props: RoomSceneProps) {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
         shadow-normalBias={0.04}
+        shadow-bias={-0.0001}
+        shadow-radius={3}
       />
       <Box at={[0, 0, 0]} size={[12.7, 0.45, 9.8]} color="#bba07a" />
       <Box at={[0, 0.24, 0]} size={[12.5, 0.04, 9.6]} color={theme.floor} />
@@ -246,7 +236,9 @@ export default function ThreeRoom(props: RoomSceneProps) {
       camera={{ position: [11, 14, 18], near: 0.1, far: 100 }}
       dpr={[1, 1.5]}
       fallback={
-        <p className="room-graphics-note">Explore this project using the station buttons below.</p>
+        <p className="room-graphics-note">
+          3D graphics are unavailable. Return to the island and choose Pixel island.
+        </p>
       }
     >
       <Room {...props} />
