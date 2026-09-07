@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import { BUILDINGS, scenePalette } from '@/lib/buildings';
+import { roomDecor } from '@/lib/room-decor';
 import { AVATARS, PALETTES, seed } from '@/lib/island';
 import { ROOM_EXIT, STATIONS } from '@/lib/room';
 import type { RoomSceneProps } from './room-scene-types';
@@ -25,7 +27,8 @@ export default function PixelRoom(props: RoomSceneProps) {
     };
     function draw(time: number) {
       const p = latest.current,
-        colors = PALETTES[p.palette],
+        theme = BUILDINGS[p.building],
+        colors = { ...scenePalette(p.palette, p.lighting), accent: theme.accent, roof: theme.roof },
         a = AVATARS.find((a) => a.id === p.avatar)!;
       p.controller.current.step(previous ? (time - previous) / 1000 : 0);
       previous = time;
@@ -34,13 +37,13 @@ export default function PixelRoom(props: RoomSceneProps) {
       c!.clearRect(0, 0, 640, 480);
       rect(58, 138, 528, 258, '#233f3520');
       rect(64, 125, 512, 260, '#856d53');
-      rect(64, 125, 512, 248, '#d6bd94');
+      rect(64, 125, 512, 248, theme.floor);
       for (let row = 0; row < 14; row++) {
         const y = 128 + row * 18;
         rect(66, y, 508, 1, '#bfa77f');
         for (let x = 68 + (row % 2) * 42; x < 574; x += 85) rect(x, y, 1, 18, '#bfa77f');
       }
-      rect(64, 55, 512, 73, '#ede6d3');
+      rect(64, 55, 512, 73, theme.wall);
       rect(64, 119, 512, 9, '#a48a65');
       rect(64, 53, 512, 5, colors.accent);
       for (let x = 78; x < 575; x += 22) rect(x, 59, 1, 57, '#ddd5bf');
@@ -62,6 +65,8 @@ export default function PixelRoom(props: RoomSceneProps) {
       rect(248, 71, 31, 34, '#a88c64');
       rect(252, 75, 23, 26, '#f7edda');
       rect(258, 81, 11, 14, ['#be866b', '#83996d', '#9c91aa'][seed(p.identity) % 3]);
+      for (const tile of roomDecor(p.building))
+        rect(364 + tile.x * 0.78, 61 + tile.y * 0.78, tile.w * 0.78, tile.h * 0.78, tile.color);
       // Plant, soft stool and a little cup.
       rect(101, 335, 22, 21, '#ad7e5e');
       rect(99, 331, 26, 6, '#c99a72');
@@ -142,7 +147,32 @@ export default function PixelRoom(props: RoomSceneProps) {
       rect(exit.x - 30, exit.y - 4, 60, 22, '#8c7557');
       rect(exit.x - 26, exit.y - 3, 52, 16, '#ebdfbf');
       text('EXIT ↓', exit.x, exit.y + 9, 10);
-      text('A SMALL ROOM. A BIG IDEA.', 320, 427, 10, colors.accent);
+      text(
+        BUILDINGS[p.building].name.toUpperCase() + ' · A BIG IDEA.',
+        320,
+        427,
+        10,
+        p.lighting === 'night' ? '#dce1c8' : colors.accent,
+      );
+      if (p.lighting === 'night') {
+        rect(64, 55, 512, 320, '#15243c18');
+        rect(474, 73, 56, 32, '#172b40');
+        for (const [x, y] of [
+          [480, 78],
+          [489, 93],
+          [518, 79],
+          [511, 98],
+        ])
+          rect(x, y, 2, 2, '#e4dfb9');
+        rect(500, 72, 3, 35, '#b7b39d');
+        rect(472, 88, 61, 3, '#b7b39d');
+        rect(451, 84, 2, 36, '#9e8c6d');
+        rect(441, 78, 22, 14, '#ebd297');
+        c!.fillStyle = '#ffdc891c';
+        c!.beginPath();
+        c!.ellipse(452, 115, 31, 18, 0, 0, Math.PI * 2);
+        c!.fill();
+      }
       frame = requestAnimationFrame(draw);
     }
     frame = requestAnimationFrame(draw);

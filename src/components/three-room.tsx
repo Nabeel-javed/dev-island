@@ -3,6 +3,8 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { useEffect } from 'react';
 import * as THREE from 'three';
+import { BUILDINGS, scenePalette } from '@/lib/buildings';
+import { roomDecor } from '@/lib/room-decor';
 import { PALETTES, seed } from '@/lib/island';
 import { STATIONS } from '@/lib/room';
 import { Explorer } from './three-island';
@@ -35,14 +37,36 @@ function Camera() {
   return null;
 }
 function Room(props: RoomSceneProps) {
-  const colors = PALETTES[props.palette];
+  const theme = BUILDINGS[props.building],
+    night = props.lighting === 'night';
+  const colors = {
+    ...scenePalette(props.palette, props.lighting),
+    accent: theme.accent,
+    roof: theme.roof,
+  };
   return (
     <>
       <Camera />
-      <ambientLight intensity={1.4} />
+      <ambientLight intensity={night ? 0.75 : 1.4} />
+      {night && (
+        <>
+          <pointLight
+            position={[2.1, 2.8, -2]}
+            color="#ffd79a"
+            intensity={18}
+            distance={11}
+            decay={2}
+          />
+          <mesh position={[2.1, 2.9, -4.4]}>
+            <coneGeometry args={[0.35, 0.4, 12]} />
+            <meshStandardMaterial color="#f6d79f" emissive="#ffcc79" emissiveIntensity={1} />
+          </mesh>
+        </>
+      )}
       <directionalLight
         position={[2, 12, 7]}
-        intensity={2.1}
+        intensity={night ? 0.9 : 2.1}
+        color={night ? '#becfeb' : '#fff3dc'}
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-10}
@@ -52,12 +76,12 @@ function Room(props: RoomSceneProps) {
         shadow-normalBias={0.04}
       />
       <Box at={[0, 0, 0]} size={[12.7, 0.45, 9.8]} color="#bba07a" />
-      <Box at={[0, 0.24, 0]} size={[12.5, 0.04, 9.6]} color="#dbc5a1" />
+      <Box at={[0, 0.24, 0]} size={[12.5, 0.04, 9.6]} color={theme.floor} />
       {Array.from({ length: 13 }, (_, i) => (
         <Box key={i} at={[-6 + i, 0.269, 0]} size={[0.022, 0.006, 9.4]} color="#bfaa87" />
       ))}
-      <Box at={[0, 1.7, -4.8]} size={[12.7, 3.1, 0.16]} color="#ebe4d2" />
-      <Box at={[-6.3, 1.7, 0]} size={[0.16, 3.1, 9.8]} color="#ddd7c3" />
+      <Box at={[0, 1.7, -4.8]} size={[12.7, 3.1, 0.16]} color={theme.wall} />
+      <Box at={[-6.3, 1.7, 0]} size={[0.16, 3.1, 9.8]} color={theme.wall} />
       <Box at={[0, 0.45, -4.67]} size={[12.5, 0.3, 0.12]} color="#b79b76" />
       <Box at={[-6.17, 0.45, 0]} size={[0.12, 0.3, 9.6]} color="#b79b76" />
       <Box at={[0, 3.3, -4.8]} size={[12.8, 0.12, 0.24]} color={colors.accent} />
@@ -75,6 +99,18 @@ function Room(props: RoomSceneProps) {
       <Box at={[4.6, 2.15, -4.57]} size={[1.48, 1.28, 0.04]} color={colors.water} />
       <Box at={[4.6, 2.15, -4.5]} size={[0.07, 1.35, 0.05]} color="#fff0d1" />
       <Box at={[4.6, 2.15, -4.5]} size={[1.55, 0.07, 0.05]} color="#fff0d1" />
+      {roomDecor(props.building).map((tile, i) => (
+        <Box
+          key={'decor' + i}
+          at={[
+            1.7 + (tile.x + tile.w / 2 - 50) / 45,
+            2.2 - (tile.y + tile.h / 2 - 34) / 45,
+            -4.6 + i * 0.0005,
+          ]}
+          size={[tile.w / 45, tile.h / 45, 0.02]}
+          color={tile.color}
+        />
+      ))}
       {STATIONS.map((s, i) => (
         <group
           key={s.id}
