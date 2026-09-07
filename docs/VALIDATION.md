@@ -98,3 +98,11 @@ Production still has no configured GitHub token or Upstash credentials. Public R
 - Rooms now include gently swaying pleated curtains and a hanging lamp, a moving clock hand and a small window-dust particle field. Night uses warm lamp lighting. All new ambient animations use a fixed time when reduced motion is requested; no new dependencies or collision obstacles were added.
 - 50 existing tests, TypeScript and production build passed. Browser access recovered during this pass: native Brave screenshots confirm day/night island and room rendering, a normal entrance completed into moss-ui, the corner lighting toggle updated the scene and URL, and the in-room README opened successfully. Clock placement and night hint contrast were corrected after visual inspection.
 - Reduced-motion behavior was reviewed in source, not exercised through browser emulation. Real-device mobile performance, Safari and video encoding remain unmeasured; no FPS claims are made. This limited browser pass does not close every outstanding check from prior releases.
+
+### Perspective room interiors — 2026-09-07
+
+- Added a perspective camera that frames the room when its canvas resizes, with zoom, alternate viewing angles and reset controls. Rounded furniture, desk chairs, individual keyboard keys, mugs, small plants, a wall shelf and a seating nook add depth while retaining the existing station collision footprints and blocked corner.
+- Station hover/focus highlights identify interactive objects. Mobile controls have larger targets and dedicated space; short screens can scroll the room layout.
+- 51 tests passed, including projection checks across five canvas sizes and three viewing angles. TypeScript, production build and formatting passed during implementation.
+- Native Brave visual checks confirmed the desktop room, zoom, angle change, reset and README side panel. The room refits alongside the panel. At an emulated 390 × 700 viewport, the room and touch/camera controls remain visible and the README opens as a full-screen panel.
+- This is browser emulation, not real-device performance testing. Safari, physical phones and reduced-motion emulation remain untested in this pass. Existing Three.js deprecation warnings are visible in development; no frame-rate claims are made.
