@@ -9,6 +9,8 @@ import { BUILDINGS, buildingFor, scenePalette } from '@/lib/buildings';
 import NightAtmosphere from './night-atmosphere';
 import IslandAtmosphere from './island-atmosphere';
 import ShaderWater from './shader-water';
+import IslandLandscape from './island-landscape';
+import RoomMaterial from './room-material';
 import SceneLighting, { GraphicsPerformance } from './scene-lighting';
 import { useGraphics, GRAPHICS } from './graphics-settings';
 import CoastalLife from './coastal-life';
@@ -19,17 +21,23 @@ function Box({
   position,
   size,
   color,
+  finish,
   ...rest
 }: {
   position: [number, number, number];
   size: [number, number, number];
   color: string;
+  finish?: 'wood' | 'plaster' | 'stone' | 'sand';
   rotation?: [number, number, number];
 }) {
   return (
     <mesh position={position} {...rest} castShadow receiveShadow>
       <boxGeometry args={size} />
-      <meshStandardMaterial color={color} roughness={0.85} />
+      {finish ? (
+        <RoomMaterial color={color} finish={finish} />
+      ) : (
+        <meshStandardMaterial color={color} roughness={0.85} />
+      )}
     </mesh>
   );
 }
@@ -59,16 +67,16 @@ function Tree({
       </mesh>
       <group ref={crown}>
         <mesh position={[0, 1.55, 0]} castShadow>
-          <icosahedronGeometry args={[0.85, 1]} />
-          <meshStandardMaterial color={color} flatShading />
+          <icosahedronGeometry args={[0.85, 2]} />
+          <meshStandardMaterial color={color} roughness={0.95} />
         </mesh>
         <mesh position={[-0.28, 2.13, 0]} castShadow>
-          <icosahedronGeometry args={[0.65, 1]} />
-          <meshStandardMaterial color="#90ae78" flatShading />
+          <icosahedronGeometry args={[0.65, 2]} />
+          <meshStandardMaterial color="#90ae78" roughness={0.95} />
         </mesh>
         <mesh position={[0.48, 1.75, 0.15]} castShadow>
           <icosahedronGeometry args={[0.58, 0]} />
-          <meshStandardMaterial color={color} flatShading />
+          <meshStandardMaterial color={color} roughness={0.95} />
         </mesh>
       </group>
     </group>
@@ -92,7 +100,13 @@ function House({ index, props }: { index: number; props: SceneProps }) {
     shape.lineTo(0, 1.05);
     shape.lineTo(1.3, 0);
     shape.closePath();
-    return new THREE.ExtrudeGeometry(shape, { depth: 2.25, bevelEnabled: false });
+    return new THREE.ExtrudeGeometry(shape, {
+      depth: 2.25,
+      bevelEnabled: true,
+      bevelThickness: 0.025,
+      bevelSize: 0.025,
+      bevelSegments: 1,
+    });
   }, []);
   useEffect(() => () => roof.dispose(), [roof]);
   return (
@@ -117,7 +131,7 @@ function House({ index, props }: { index: number; props: SceneProps }) {
         </mesh>
       )}
       <Box position={[0, 0.06, 0]} size={[2.65, 0.14, 2.3]} color="#d6c79f" />
-      <Box position={[0, 0.9, 0]} size={[2.2, 1.7, 1.9]} color={theme.wall} />
+      <Box position={[0, 0.9, 0]} size={[2.2, 1.7, 1.9]} color={theme.wall} finish="plaster" />
       {kind === 'observatory' ? (
         <mesh position={[0, 1.85, 0]}>
           <sphereGeometry args={[1.3, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
@@ -138,7 +152,7 @@ function House({ index, props }: { index: number; props: SceneProps }) {
       )}
       <Box position={[0, 0.53, 0.961]} size={[0.46, 1.06, 0.015]} color="#3c4135" />
       <group ref={door} position={[-0.22, 0.53, 0.99]}>
-        <Box position={[0.22, 0, 0]} size={[0.44, 1.04, 0.07]} color="#877557" />
+        <Box position={[0.22, 0, 0]} size={[0.44, 1.04, 0.07]} color="#877557" finish="wood" />
         <mesh position={[0.34, -0.01, 0.05]}>
           <sphereGeometry args={[0.035, 6, 6]} />
           <meshStandardMaterial color="#e5c384" />
@@ -474,11 +488,11 @@ function World(props: SceneProps) {
       </mesh>
       <mesh position={[0, -0.15, 0]} scale={[1, 1, 0.72]} receiveShadow>
         <cylinderGeometry args={[9.6, 10.1, 0.55, 64]} />
-        <meshStandardMaterial color="#e8d5a8" />
+        <RoomMaterial color="#dcc79e" finish="sand" />
       </mesh>
       <mesh position={[0, 0.09, -0.15]} scale={[1, 1, 0.72]} receiveShadow>
         <cylinderGeometry args={[9.15, 9.4, 0.3, 64]} />
-        <meshStandardMaterial color={p.grass} />
+        <RoomMaterial color={p.grass} finish="grass" />
       </mesh>
       <Box position={[0, 0.25, 1.5]} size={[0.95, 0.025, 10.7]} color="#e0ceaa" />
       <Box position={[0, 0.252, -1.5]} size={[11, 0.027, 0.72]} color="#e0ceaa" />
@@ -497,7 +511,7 @@ function World(props: SceneProps) {
       {props.island.projects.map((project, index) => (
         <House key={project.id} index={index} props={props} />
       ))}
-      <Box position={[0, 0.15, 7.3]} size={[1.5, 0.18, 3.7]} color="#a5865d" />
+      <Box position={[0, 0.15, 7.3]} size={[1.5, 0.18, 3.7]} color="#a5865d" finish="wood" />
       {Array.from({ length: 17 }, (_, i) => (
         <Box
           key={'plank' + i}
@@ -541,6 +555,7 @@ function World(props: SceneProps) {
           </group>
         );
       })}
+      <IslandLandscape still={props.reducedMotion} grass={p.grass} />
       <CoastalLife still={props.reducedMotion} night={night} />
       <IslandAtmosphere island={props.island} reducedMotion={props.reducedMotion} night={night} />
       <Boat motion={!props.reducedMotion} />
