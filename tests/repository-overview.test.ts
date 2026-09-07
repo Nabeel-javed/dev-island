@@ -76,3 +76,9 @@ test('inspection failure stays explicit rather than presenting empty evidence as
   assert.equal(r.status, 'unavailable');
   assert.equal(r.inference, false);
 });
+
+test('root HTML entry point provides a qualified website explanation without inventing its content', () => {
+  const r = describeRepository([{ path: 'index.html', type: 'file' }], {}, base, 'main');
+  assert.match(r.summary, /suggests a static website/);
+  assert.equal(r.evidence[0].url, base + '/blob/main/index.html');
+});

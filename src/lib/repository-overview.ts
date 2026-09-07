@@ -106,6 +106,17 @@ export function describeRepository(
   ])
     if (files[path]) add(fact, path);
   for (const entry of entries) {
+    if (entry.type !== 'file') continue;
+    if (entry.path === 'index.html') {
+      add('Contains a root HTML page, which browsers can display.', entry.path);
+      if (!purpose) purpose = 'a static website or browser demo';
+    }
+    if (entry.path === 'Dockerfile')
+      add('Includes container build instructions; they have not been run.', entry.path);
+    if (entry.path === 'main.py')
+      add('Contains a Python file named main.py, a possible starting point to read.', entry.path);
+  }
+  for (const entry of entries) {
     if (!validPath(entry.path) || entry.type !== 'dir') continue;
     const labels: Record<string, string> = {
       src: 'Has a source-code directory.',

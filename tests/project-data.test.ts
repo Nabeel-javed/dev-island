@@ -52,3 +52,15 @@ test('sample project details are complete without external requests', async () =
   assert.match(p.readme.html, /<table>/);
   assert.equal(p.readme.images.length, 1);
 });
+
+test('missing README and description trigger inspection and retain source-linked overview', async () => {
+  const p = await fetchPublicProject('owner/repo', async (path) => {
+    if (path.endsWith('/readme')) throw new GitHubError('missing', 404);
+    if (path.endsWith('/languages')) return { HTML: 120 };
+    if (path.includes('/contents?')) return [{ path: 'index.html', type: 'file', size: 120 }];
+    return { ...repo, default_branch: 'main' };
+  });
+  assert.equal(p.readme.status, 'missing');
+  assert.match(p.overview!.summary, /static website/);
+  assert.equal(p.overview!.inference, true);
+});
