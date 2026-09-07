@@ -14,18 +14,21 @@ export const metadata: Metadata = {
     siteName: 'Dev Island',
     images: [
       {
-        url: '/social/dev-island-3d-v2.jpg',
+        url: '/social/dev-island-3d-v3.jpg',
         width: 1200,
         height: 630,
         type: 'image/jpeg',
-        alt: 'Dev Island — Your GitHub. A little world. A miniature 3D island with six project buildings.',
+        alt: 'Dev Island — Your GitHub, with room to explore. A miniature 3D island with six project buildings.',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     images: [
-      { url: '/social/dev-island-3d-v2.jpg', alt: 'Dev Island — Your GitHub. A little world.' },
+      {
+        url: '/social/dev-island-3d-v3.jpg',
+        alt: 'Dev Island — Your GitHub, with room to explore.',
+      },
     ],
   },
   title: 'Dev Island — Your code, a world of its own',
