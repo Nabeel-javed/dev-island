@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
       username,
       readAppearance(params).palette,
       await getCustomIsland(island, params),
+      readAppearance(params).lighting,
     );
   } catch (error) {
     return new Response('This island card is unavailable. Please try again later.', {

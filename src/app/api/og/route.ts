@@ -5,5 +5,10 @@ export function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams,
     username = params.get('username') ?? 'demo';
   if (!validUsername(username)) return new Response('Invalid username', { status: 400 });
-  return socialCard(username, readAppearance(params).palette);
+  return socialCard(
+    username,
+    readAppearance(params).palette,
+    undefined,
+    readAppearance(params).lighting,
+  );
 }
