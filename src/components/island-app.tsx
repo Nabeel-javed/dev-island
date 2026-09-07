@@ -41,6 +41,9 @@ import {
 } from '@/lib/island';
 import { scenePalette, type LightingId } from '@/lib/buildings';
 import { useController } from './use-controller';
+import { useEntrance } from './use-entrance';
+import type { DoorwayFrame } from '@/lib/doorway';
+import ProjectPeek from './project-peek';
 import { usePassport } from './use-passport';
 import IslandGuide from './island-guide';
 import ExplorerPassport from './explorer-passport';
@@ -89,6 +92,9 @@ export default function IslandApp({
     [palette, setPalette] = useState<PaletteId>(initialAppearance.palette),
     [lighting, setLighting] = useState<LightingId>(initialAppearance.lighting),
     [avatar, setAvatar] = useState<AvatarId>(initialAppearance.avatar);
+  const [peek, setPeek] = useState<number | null>(null);
+  const entryFrame = useRef<DoorwayFrame | null>(null);
+  const entryStart = useRef<(index: number) => void>(() => {});
   const [selected, setSelected] = useState<number | null>(null),
     [ready, setReady] = useState(false),
     [reducedMotion, setReducedMotion] = useState(false),
@@ -110,7 +116,7 @@ export default function IslandApp({
     timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
-  const select = useCallback(
+  const openRoom = useCallback(
     (i: number, replace = false) => {
       const p = island.projects[i];
       if (!p) return;
@@ -121,6 +127,7 @@ export default function IslandApp({
         '',
         url,
       );
+      setPeek(null);
       setSelected(i);
       collect(i);
     },
@@ -128,9 +135,38 @@ export default function IslandApp({
   );
   const controller = useController(
     island.projects.length,
-    select,
-    selected !== null || about || guideOpen || cardOpen || trailerOpen || editorOpen,
+    (index) => entryStart.current(index),
+    selected !== null ||
+      about ||
+      guideOpen ||
+      cardOpen ||
+      trailerOpen ||
+      editorOpen ||
+      entryFrame.current !== null,
   );
+  const entrance = useEntrance(
+    controller,
+    entryFrame,
+    island.projects.length,
+    reducedMotion,
+    ready,
+    openRoom,
+  );
+  const select = (index: number, replace = false) => {
+    stage.current?.scrollIntoView({ block: 'center', behavior: 'instant' });
+    stage.current?.focus({ preventScroll: true });
+    entrance.enter(index, replace);
+  };
+  entryStart.current = select;
+  const preview = useCallback((index: number) => {
+    if (!entryFrame.current) setPeek(index);
+  }, []);
+  useEffect(() => {
+    if (about || guideOpen || cardOpen || trailerOpen || editorOpen) entrance.cancel();
+  }, [about, guideOpen, cardOpen, trailerOpen, editorOpen, entrance.cancel]);
+  useEffect(() => {
+    entrance.cancel();
+  }, [style, entrance.cancel]);
   const onReady = useCallback(() => setReady(true), []);
   const restoreDoorway = useCallback(() => {
     const i = selectedRef.current;
@@ -318,7 +354,7 @@ export default function IslandApp({
                   if (tourStep + 1 >= tourTotal) exitRoom();
                   else {
                     setTourStep(tourStep + 1);
-                    select(tourStep + 1, true);
+                    openRoom(tourStep + 1, true);
                   }
                 },
                 onStop: () => setTourStep(null),
@@ -465,7 +501,10 @@ export default function IslandApp({
                         lighting={lighting}
                         avatar={avatar}
                         controller={controller}
-                        onSelect={select}
+                        onSelect={preview}
+                        onPreview={preview}
+                        previewIndex={peek}
+                        entry={entryFrame}
                         reducedMotion={reducedMotion}
                         onReady={onReady}
                       />
@@ -476,7 +515,10 @@ export default function IslandApp({
                         lighting={lighting}
                         avatar={avatar}
                         controller={controller}
-                        onSelect={select}
+                        onSelect={preview}
+                        onPreview={preview}
+                        previewIndex={peek}
+                        entry={entryFrame}
                         reducedMotion={reducedMotion}
                         onReady={onReady}
                       />
@@ -486,6 +528,15 @@ export default function IslandApp({
                 {!ready && (
                   <div className="world-loading">
                     <span className="spinner" /> Growing your little world…
+                  </div>
+                )}
+                {entrance.index !== null && (
+                  <div className="entrance-status" role="status">
+                    <span>Entering {island.projects[entrance.index].name}…</span>
+                    <button onClick={entrance.skip}>Skip animation →</button>
+                    <button aria-label="Cancel entry" onClick={entrance.cancel}>
+                      <X size={16} />
+                    </button>
                   </div>
                 )}
                 <IslandGuide
@@ -551,6 +602,17 @@ export default function IslandApp({
                   ))}
                 </div>
               </div>
+              <ProjectPeek
+                project={peek === null ? null : island.projects[peek]}
+                entering={entrance.index !== null}
+                onEnter={() => {
+                  if (peek !== null) select(peek);
+                }}
+                onClose={() => {
+                  setPeek(null);
+                  stage.current?.focus({ preventScroll: true });
+                }}
+              />
               <div className="control-strip">
                 <span>
                   <kbd>W</kbd>

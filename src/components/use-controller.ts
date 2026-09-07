@@ -8,6 +8,7 @@ export type Controller = {
   dy: number;
   moving: boolean;
   paused: boolean;
+  scripted?: boolean;
   step: (dt: number) => void;
   keys: Set<string>;
 };
@@ -44,7 +45,7 @@ export function useController(
   controller.current.step = (dt) => {
     const c = controller.current;
     if (c.paused) {
-      c.moving = false;
+      if (!c.scripted) c.moving = false;
       return;
     }
     const dx =

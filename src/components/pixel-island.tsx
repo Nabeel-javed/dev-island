@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import type PhaserType from 'phaser';
+import type { DoorwayFrame } from '@/lib/doorway';
 import type { LightingId } from '@/lib/buildings';
 import { Island, PaletteId, AvatarId, PLOTS } from '@/lib/island';
 import { H, W, paintIsland, point } from '@/lib/pixel-art';
@@ -12,6 +13,9 @@ export type SceneProps = {
   avatar: AvatarId;
   controller: React.RefObject<Controller>;
   onSelect: (index: number) => void;
+  onPreview?: (index: number) => void;
+  previewIndex?: number | null;
+  entry?: React.RefObject<DoorwayFrame | null>;
   reducedMotion: boolean;
   onReady: () => void;
 };
@@ -39,6 +43,15 @@ export default function PixelIsland(props: SceneProps) {
               });
               if (index >= 0) latest.current.onSelect(index);
             });
+            this.input.on('pointermove', (pointer: PhaserType.Input.Pointer) => {
+              const index = PLOTS.slice(0, latest.current.island.projects.length).findIndex((p) => {
+                const q = point(p.x, p.y);
+                return (
+                  Math.abs(pointer.x - q.x) < 33 && pointer.y > q.y - 49 && pointer.y < q.y + 43
+                );
+              });
+              if (index >= 0) latest.current.onPreview?.(index);
+            });
             latest.current.onReady();
           }
           update(time: number, delta: number) {
@@ -54,6 +67,14 @@ export default function PixelIsland(props: SceneProps) {
               p.reducedMotion ? 0 : time,
               p.lighting,
             );
+            const selected = p.entry?.current?.index ?? p.previewIndex;
+            if (selected !== null && selected !== undefined && PLOTS[selected]) {
+              const q = point(PLOTS[selected].x, PLOTS[selected].y);
+              const ctx = this.texture.context;
+              ctx.strokeStyle = p.lighting === 'night' ? '#f0d59b' : '#456c50';
+              ctx.lineWidth = 2;
+              ctx.strokeRect(q.x - 34, q.y - 50, 68, 94);
+            }
             this.texture.refresh();
           }
         }

@@ -75,6 +75,12 @@ function House({ index, props }: { index: number; props: SceneProps }) {
   const kind = buildingFor(project),
     theme = BUILDINGS[kind],
     night = props.lighting === 'night';
+  const door = useRef<THREE.Group>(null);
+  useFrame(() => {
+    if (!door.current) return;
+    const entry = props.entry?.current;
+    door.current.rotation.y = entry?.index === index ? -Math.PI * 0.62 * entry.door : 0;
+  });
   const roof = useMemo(() => {
     const shape = new THREE.Shape();
     shape.moveTo(-1.3, 0);
@@ -93,11 +99,18 @@ function House({ index, props }: { index: number; props: SceneProps }) {
       }}
       onPointerOver={() => {
         document.body.style.cursor = 'pointer';
+        props.onPreview?.(index);
       }}
       onPointerOut={() => {
         document.body.style.cursor = '';
       }}
     >
+      {props.previewIndex === index && (
+        <mesh position={[0, -0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.6, 1.72, 48]} />
+          <meshBasicMaterial color={night ? '#f0d59b' : '#6b896a'} side={THREE.DoubleSide} />
+        </mesh>
+      )}
       <Box position={[0, 0.06, 0]} size={[2.65, 0.14, 2.3]} color="#d6c79f" />
       <Box position={[0, 0.9, 0]} size={[2.2, 1.7, 1.9]} color={theme.wall} />
       {kind === 'observatory' ? (
@@ -118,11 +131,14 @@ function House({ index, props }: { index: number; props: SceneProps }) {
           <Box position={[0.68, 2.78, -0.42]} size={[0.36, 0.12, 0.39]} color="#e3d7bc" />
         </>
       )}
-      <Box position={[0, 0.53, 0.97]} size={[0.44, 1.04, 0.07]} color="#877557" />
-      <mesh position={[0.12, 0.52, 1.02]}>
-        <sphereGeometry args={[0.035, 6, 6]} />
-        <meshStandardMaterial color="#e5c384" />
-      </mesh>
+      <Box position={[0, 0.53, 0.961]} size={[0.46, 1.06, 0.015]} color="#3c4135" />
+      <group ref={door} position={[-0.22, 0.53, 0.99]}>
+        <Box position={[0.22, 0, 0]} size={[0.44, 1.04, 0.07]} color="#877557" />
+        <mesh position={[0.34, -0.01, 0.05]}>
+          <sphereGeometry args={[0.035, 6, 6]} />
+          <meshStandardMaterial color="#e5c384" />
+        </mesh>
+      </group>
       {[-0.73, 0.73].map((x) => (
         <group key={x}>
           <mesh position={[x, 1.06, 0.976]}>
@@ -223,7 +239,11 @@ function House({ index, props }: { index: number; props: SceneProps }) {
         </>
       )}
       <Html position={[0, 3.7, 0]} center zIndexRange={[15, 0]}>
-        <button className="house-label" onClick={() => props.onSelect(index)}>
+        <button
+          className="house-label"
+          onFocus={() => props.onPreview?.(index)}
+          onClick={() => props.onSelect(index)}
+        >
           {project.name}
         </button>
       </Html>
@@ -299,21 +319,34 @@ export function Explorer({
     </group>
   );
 }
-function FitCamera({ cinematic, count }: { cinematic?: RefObject<number>; count: number }) {
+function FitCamera({
+  cinematic,
+  count,
+  entry,
+}: {
+  cinematic?: RefObject<number>;
+  count: number;
+  entry?: SceneProps['entry'];
+}) {
   const { camera, size } = useThree();
-  useEffect(() => {
-    if (camera instanceof THREE.OrthographicCamera) {
-      camera.zoom = Math.min(size.width / 25.5, size.height / 22);
-      camera.lookAt(0, 0, 1);
-      camera.updateProjectionMatrix();
-    }
-  }, [camera, size]);
   useFrame(() => {
-    if (!cinematic || !(camera instanceof THREE.OrthographicCamera)) return;
-    const frame = trailerFrame(cinematic.current, count);
-    camera.position.set(...frame.position);
-    camera.lookAt(...frame.target);
-    camera.zoom = Math.min(size.width / 25.5, size.height / 22) * frame.zoom;
+    if (!(camera instanceof THREE.OrthographicCamera)) return;
+    const zoom = Math.min(size.width / 25.5, size.height / 22);
+    if (cinematic) {
+      const frame = trailerFrame(cinematic.current, count);
+      camera.position.set(...frame.position);
+      camera.lookAt(...frame.target);
+      camera.zoom = zoom * frame.zoom;
+    } else {
+      const frame = entry?.current;
+      const plot = frame ? PLOTS[frame.index] : undefined;
+      const focus = frame?.focus ?? 0;
+      const x = (plot?.x ?? 0) * focus * 0.75;
+      const z = 1 + ((plot?.y ?? 1) - 1) * focus * 0.75;
+      camera.position.set(14 + x, 18, 21 + z);
+      camera.lookAt(x, focus * 0.5, z);
+      camera.zoom = zoom * (1 + focus * 0.32);
+    }
     camera.updateProjectionMatrix();
   });
   return null;
@@ -415,7 +448,11 @@ function World(props: SceneProps) {
         shadow-normalBias={0.04}
       />
       {night && <NightAtmosphere reducedMotion={props.reducedMotion} />}
-      <FitCamera cinematic={props.cinematic} count={props.island.projects.length} />
+      <FitCamera
+        cinematic={props.cinematic}
+        count={props.island.projects.length}
+        entry={props.entry}
+      />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]} receiveShadow>
         <planeGeometry args={[200, 200]} />
         <meshStandardMaterial color={p.water} roughness={0.8} />
