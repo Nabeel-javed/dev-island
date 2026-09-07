@@ -189,7 +189,9 @@ export default function ProjectRoom({
           <p>
             {tour
               ? 'Take a look around. Open any station, then continue when you’re ready.'
-              : `${stamps.count} / ${stamps.total} passport stamps · Visit every room to unlock your souvenir.`}
+              : stamps.total > 0 && stamps.count === stamps.total
+                ? 'Passport complete! Return to the island to download your souvenir.'
+                : `${stamps.count} / ${stamps.total} passport stamps · Visit every room to unlock your souvenir.`}
           </p>
         </div>
         {tour && (
