@@ -1,6 +1,6 @@
 'use client';
 import { Canvas, useThree } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Html, RoundedBox } from '@react-three/drei';
 import { useEffect, useState } from 'react';
 import { ZoomIn, ZoomOut, RotateCcw, MoveHorizontal } from 'lucide-react';
 import { roomCameraFrame, ROOM_FOV } from '@/lib/room-camera';
@@ -11,6 +11,7 @@ import { PALETTES, seed } from '@/lib/island';
 import { STATIONS } from '@/lib/room';
 import { Explorer } from './three-island';
 import RoomAtmosphere from './room-atmosphere';
+import RoomFurnishings from './room-furnishings';
 import type { RoomSceneProps } from './room-scene-types';
 function Box({
   at,
@@ -21,6 +22,19 @@ function Box({
   size: [number, number, number];
   color: string;
 }) {
+  if (Math.min(...size) >= 0.1)
+    return (
+      <RoundedBox
+        position={at}
+        args={size}
+        radius={Math.min(0.055, Math.min(...size) / 5)}
+        smoothness={2}
+        castShadow
+        receiveShadow
+      >
+        <meshStandardMaterial color={color} roughness={0.8} />
+      </RoundedBox>
+    );
   return (
     <mesh position={at} castShadow receiveShadow>
       <boxGeometry args={size} />
@@ -40,6 +54,13 @@ function Camera({ zoom, angle }: { zoom: number; angle: number }) {
   return null;
 }
 function Room(props: RoomSceneProps & { zoom: number; angle: number }) {
+  const [hovered, setHovered] = useState(-1);
+  useEffect(
+    () => () => {
+      document.body.style.cursor = '';
+    },
+    [],
+  );
   const theme = BUILDINGS[props.building],
     night = props.lighting === 'night';
   const colors = {
@@ -53,6 +74,7 @@ function Room(props: RoomSceneProps & { zoom: number; angle: number }) {
       <ambientLight intensity={night ? 0.55 : 0.8} />
       <hemisphereLight args={[night ? '#a6bce9' : '#fff3da', '#798b72', 0.65]} />
       <RoomAtmosphere reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
+      <RoomFurnishings reducedMotion={props.reducedMotion} night={night} accent={colors.accent} />
       <directionalLight
         position={[2, 12, 7]}
         intensity={night ? 0.9 : 2.7}
@@ -72,8 +94,8 @@ function Room(props: RoomSceneProps & { zoom: number; angle: number }) {
       {Array.from({ length: 13 }, (_, i) => (
         <Box key={i} at={[-6 + i, 0.269, 0]} size={[0.022, 0.006, 9.4]} color="#bfaa87" />
       ))}
-      <Box at={[0, 1.7, -4.8]} size={[12.7, 3.1, 0.16]} color={theme.wall} />
-      <Box at={[-6.3, 1.7, 0]} size={[0.16, 3.1, 9.8]} color={theme.wall} />
+      <Box at={[0, 1.7, -4.88]} size={[12.7, 3.1, 0.3]} color={theme.wall} />
+      <Box at={[-6.38, 1.7, 0]} size={[0.3, 3.1, 9.8]} color={theme.wall} />
       <Box at={[0, 0.45, -4.67]} size={[12.5, 0.3, 0.12]} color="#b79b76" />
       <Box at={[-6.17, 0.45, 0]} size={[0.12, 0.3, 9.6]} color="#b79b76" />
       <Box at={[0, 3.3, -4.8]} size={[12.8, 0.12, 0.24]} color={colors.accent} />
@@ -107,11 +129,31 @@ function Room(props: RoomSceneProps & { zoom: number; angle: number }) {
         <group
           key={s.id}
           position={[s.x, 0.26, s.y]}
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            setHovered(i);
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            setHovered(-1);
+            document.body.style.cursor = '';
+          }}
           onClick={(e) => {
             e.stopPropagation();
             props.onInteract(i);
           }}
         >
+          {hovered === i && (
+            <mesh position={[0, 0.045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[1.25, 1.31, 48]} />
+              <meshBasicMaterial
+                color={night ? '#f4d8a4' : colors.accent}
+                transparent
+                opacity={0.8}
+                depthWrite={false}
+              />
+            </mesh>
+          )}
           {i === 0 ? (
             <>
               <Box at={[0, 1.8, 0]} size={[s.width, 1.55, 0.16]} color="#8d704e" />
@@ -184,7 +226,11 @@ function Room(props: RoomSceneProps & { zoom: number; angle: number }) {
           )}
           <Html position={[0, i === 1 ? 3 : 2.9, 0]} center zIndexRange={[10, 0]}>
             <button
-              className="room-object-label"
+              className={'room-object-label' + (hovered === i ? ' is-active' : '')}
+              aria-label={`Open ${s.title}`}
+              title={s.caption}
+              onFocus={() => setHovered(i)}
+              onBlur={() => setHovered(-1)}
               onClick={(e) => {
                 e.stopPropagation();
                 props.onInteract(i);

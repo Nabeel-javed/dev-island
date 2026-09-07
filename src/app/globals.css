@@ -2998,3 +2998,22 @@ footer button {
     min-height: 330px;
   }
 }
+
+.room-object-label.is-active {
+  background: #365e49;
+  color: #fff7dd;
+  border-color: #365e49;
+  box-shadow: 0 3px 12px #284d3826;
+}
+.room-night .room-object-label.is-active {
+  background: #efe0bc;
+  color: #28453d;
+}
+@media (max-height: 650px), (max-width: 760px) {
+  .project-room {
+    overflow-y: auto;
+  }
+  .room-layout {
+    flex-shrink: 0;
+  }
+}
