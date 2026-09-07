@@ -2615,3 +2615,22 @@ footer button {
     max-width: none;
   }
 }
+
+.island-error {
+  max-width: 680px;
+  margin: 12vh auto;
+  padding: 32px;
+}
+.island-error h1 {
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: -2px;
+}
+.island-error p {
+  line-height: 1.7;
+  color: #647468;
+}
+.island-error a {
+  display: block;
+  margin-top: 24px;
+  text-decoration: underline;
+}

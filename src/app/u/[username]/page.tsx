@@ -1,51 +1,37 @@
+import { cache } from 'react';
+import { notFound } from 'next/navigation';
 import { getCustomIsland } from '@/lib/custom-island';
-import { recordParams } from '@/lib/customization';
-import { appearanceFromRecord } from '@/lib/island';
-import type { Metadata } from 'next';
+import { appearanceFromRecord, validUsername } from '@/lib/island';
 import IslandApp from '@/components/island-app';
 import { getIsland, GitHubError } from '@/lib/github';
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ username: string }>;
-}): Promise<Metadata> {
-  const { username } = await params;
-  return {
-    openGraph: { images: [`/api/og?username=${encodeURIComponent(username)}`] },
-    twitter: {
-      card: 'summary_large_image',
-      images: [`/api/og?username=${encodeURIComponent(username)}`],
-    },
-    title: `${username}’s island — Dev Island`,
-    description: 'Explore the projects and little discoveries on this playable GitHub island.',
-  };
-}
-export default async function Page({
-  params,
-  searchParams,
-}: {
+import { islandMetadata } from '@/lib/island-metadata';
+type Props = {
   params: Promise<{ username: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const { username } = await params;
+};
+const load = cache(async (username: string, query: string) => {
+  if (!validUsername(username)) notFound();
   try {
-    const query = await searchParams;
-    return (
-      <IslandApp
-        key={username}
-        island={await getCustomIsland(await getIsland(username), recordParams(query))}
-        initialAppearance={appearanceFromRecord(query)}
-      />
-    );
+    return await getCustomIsland(await getIsland(username), new URLSearchParams(query));
   } catch (error) {
-    return (
-      <main style={{ padding: '100px 30px', maxWidth: 650 }}>
-        <h1>This island is out of sight.</h1>
-        <p>{error instanceof GitHubError ? error.message : 'Please try again shortly.'}</p>
-        <a href="/" style={{ display: 'inline-block', marginTop: 30, textDecoration: 'underline' }}>
-          Back to the archipelago →
-        </a>
-      </main>
-    );
+    if (error instanceof GitHubError && [400, 404].includes(error.status)) notFound();
+    throw error;
   }
+});
+async function input(props: Props) {
+  const [{ username }, record] = await Promise.all([props.params, props.searchParams]);
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(record))
+    if (typeof value === 'string') query.set(key, value);
+  return { username, record, query, island: await load(username, query.toString()) };
+}
+export async function generateMetadata(props: Props) {
+  const { island, query } = await input(props);
+  return islandMetadata(island, query);
+}
+export default async function Page(props: Props) {
+  const { username, record, island } = await input(props);
+  return (
+    <IslandApp key={username} island={island} initialAppearance={appearanceFromRecord(record)} />
+  );
 }

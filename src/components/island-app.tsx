@@ -1,6 +1,15 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { Component, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Component,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -91,8 +100,9 @@ export default function IslandApp({
     [toast, setToast] = useState(''),
     [username, setUsername] = useState(''),
     [error, setError] = useState(''),
-    [loading, setLoading] = useState(false),
     [about, setAbout] = useState(false);
+  const router = useRouter();
+  const [loading, startNavigation] = useTransition();
   const { visited, collect, persistent } = usePassport(island);
   const tourTotal = Math.min(3, island.projects.length);
   const stage = useRef<HTMLDivElement>(null),
@@ -213,7 +223,7 @@ export default function IslandApp({
     url.searchParams.set('palette', p);
     url.searchParams.set('avatar', a);
     url.searchParams.set('lighting', next.lighting ?? lighting);
-    window.history.replaceState({}, '', url);
+    window.history.replaceState({ ...window.history.state }, '', url);
   }
   async function share() {
     try {
@@ -277,17 +287,12 @@ export default function IslandApp({
       setError('Enter a valid GitHub username.');
       return;
     }
-    setLoading(true);
     setError('');
-    try {
-      const response = await fetch(`/api/island/${encodeURIComponent(u)}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Could not find this island.');
-      window.location.href = `/u/${encodeURIComponent(u)}?style=${style}&palette=${palette}&avatar=${avatar}&lighting=${lighting}`;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Please try again.');
-      setLoading(false);
-    }
+    startNavigation(() => {
+      router.push(
+        `/u/${encodeURIComponent(u)}?style=${style}&palette=${palette}&avatar=${avatar}&lighting=${lighting}#explore`,
+      );
+    });
   }
   const project = selected === null ? null : island.projects[selected];
   const stars = island.projects.reduce((n, p) => n + p.stars, 0);
@@ -356,8 +361,8 @@ export default function IslandApp({
             </h1>
             <p>
               Turn your GitHub into a little island worth exploring.
-              <br className="desktop-break" /> Every project has a place. Every contribution grows
-              something.
+              <br className="desktop-break" /> Every project has a place. Step inside and discover
+              the story behind it.
             </p>
           </div>
           <div className="create-box">
@@ -437,6 +442,8 @@ export default function IslandApp({
                 className={'world-stage' + (lighting === 'night' ? ' world-night' : '')}
                 style={{ background: scenePalette(palette, lighting).water }}
                 ref={stage}
+                data-game-controls
+                onPointerDown={() => stage.current?.focus({ preventScroll: true })}
                 tabIndex={0}
                 aria-label="Interactive island. Use arrow keys to walk and Enter or E to open a nearby project."
               >

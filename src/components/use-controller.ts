@@ -68,6 +68,7 @@ export function useController(
     const c = controller.current;
     const down = (e: KeyboardEvent) => {
       if (c.paused || e.defaultPrevented) return;
+      if (!(e.target instanceof HTMLElement) || !e.target.closest('[data-game-controls]')) return;
       if (
         e.target instanceof HTMLElement &&
         (e.target.closest(
@@ -102,11 +103,13 @@ export function useController(
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
     window.addEventListener('blur', clear);
+    document.addEventListener('focusin', clear);
     document.addEventListener('visibilitychange', clear);
     return () => {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
       window.removeEventListener('blur', clear);
+      document.removeEventListener('focusin', clear);
       document.removeEventListener('visibilitychange', clear);
       clear();
     };

@@ -218,6 +218,8 @@ export default function ProjectRoom({
           <div
             className="room-world"
             ref={stage}
+            data-game-controls
+            onPointerDown={() => stage.current?.focus({ preventScroll: true })}
             tabIndex={0}
             aria-label="Walkable project room. Walk with WASD or arrow keys. Press Enter or E near an object. Escape returns to the island."
           >

@@ -208,7 +208,7 @@ async function fetchPublicIsland(login: string): Promise<Island> {
     source: 'github',
     updatedAt: new Date().toISOString(),
     notice:
-      'Public repositories are live. Pinned projects and the contribution garden become available when the host configures a GitHub API token.' +
+      'These projects are from public GitHub data. Pinned projects and contribution history are not available on this island yet.' +
       (u.public_repos > 500
         ? ' Showing selections from the 500 most recently updated repositories.'
         : ''),
