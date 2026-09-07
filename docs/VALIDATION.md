@@ -91,3 +91,10 @@ Verification:
 Limits: native Brave automation opened the local and production test URLs but returned a blank screenshot and no page accessibility controls, even after reconnecting and raising the window. This release therefore does **not** establish an interactive browser pass for entrance timing, cancel/skip, mobile layout, keyboard focus, reduced motion or actual trailer recording/playback/download. Earlier browser checks above do not validate these new behaviors. Test those flows on real mobile hardware and Safari as well.
 
 Production still has no configured GitHub token or Upstash credentials. Public REST data and per-process memory caching remain available; authenticated pinned projects/contribution history, distributed caching/throttling and traffic-spike capacity remain unverified deployment work. No credentials, accounts or browser security settings were changed.
+
+### 3D atmosphere polish — 2026-09-07
+
+- Added coastal rocks, three expanding shoreline rings, two orbiting/flapping daytime gulls, and chimney smoke for cottage/cafe buildings. Stronger directional lighting and lower ambient fill make building faces and shadows more distinct.
+- Rooms now include gently swaying pleated curtains and a hanging lamp, a moving clock hand and a small window-dust particle field. Night uses warm lamp lighting. All new ambient animations use a fixed time when reduced motion is requested; no new dependencies or collision obstacles were added.
+- 50 existing tests, TypeScript and production build passed. Browser access recovered during this pass: native Brave screenshots confirm day/night island and room rendering, a normal entrance completed into moss-ui, the corner lighting toggle updated the scene and URL, and the in-room README opened successfully. Clock placement and night hint contrast were corrected after visual inspection.
+- Reduced-motion behavior was reviewed in source, not exercised through browser emulation. Real-device mobile performance, Safari and video encoding remain unmeasured; no FPS claims are made. This limited browser pass does not close every outstanding check from prior releases.
