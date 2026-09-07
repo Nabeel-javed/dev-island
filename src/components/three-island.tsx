@@ -9,6 +9,7 @@ import { BUILDINGS, buildingFor, scenePalette } from '@/lib/buildings';
 import NightAtmosphere from './night-atmosphere';
 import IslandAtmosphere from './island-atmosphere';
 import ShaderWater from './shader-water';
+import CoastalLife from './coastal-life';
 import { trailerFrame } from '@/lib/trailer';
 type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
 const V = (x: number, y: number, z: number): [number, number, number] => [x, y, z];
@@ -45,8 +46,8 @@ function Tree({
 }) {
   const crown = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
-    if (crown.current && motion)
-      crown.current.rotation.z = Math.sin(clock.elapsedTime * 0.7 + index) * 0.018;
+    if (crown.current)
+      crown.current.rotation.z = motion ? Math.sin(clock.elapsedTime * 0.7 + index) * 0.018 : 0;
   });
   return (
     <group position={[x, 0.22, z]}>
@@ -355,10 +356,13 @@ function FitCamera({
 }
 function Boat({ motion }: { motion: boolean }) {
   const ref = useRef<THREE.Group>(null);
+  const sail = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
-    if (ref.current && motion) {
-      ref.current.position.y = -0.5 + Math.sin(clock.elapsedTime) * 0.05;
-      ref.current.rotation.z = Math.sin(clock.elapsedTime * 0.7) * 0.04;
+    if (sail.current)
+      sail.current.rotation.y = motion ? Math.sin(clock.elapsedTime * 1.4) * 0.12 : 0;
+    if (ref.current) {
+      ref.current.position.y = -0.5 + (motion ? Math.sin(clock.elapsedTime) * 0.05 : 0);
+      ref.current.rotation.z = motion ? Math.sin(clock.elapsedTime * 0.7) * 0.04 : 0;
     }
   });
   return (
@@ -369,7 +373,7 @@ function Boat({ motion }: { motion: boolean }) {
       </mesh>
       <Box position={[0, 0.15, 0]} size={[0.55, 0.1, 1.1]} color="#eddbad" />
       <Box position={[0, 0.85, 0]} size={[0.045, 1.4, 0.045]} color="#886e4e" />
-      <mesh position={[0.26, 1, 0]}>
+      <mesh ref={sail} position={[0.26, 1, 0]}>
         <planeGeometry args={[0.5, 0.7]} />
         <meshStandardMaterial color="#fff3d6" side={THREE.DoubleSide} />
       </mesh>
@@ -531,6 +535,7 @@ function World(props: SceneProps) {
           </group>
         );
       })}
+      <CoastalLife still={props.reducedMotion} night={night} />
       <IslandAtmosphere island={props.island} reducedMotion={props.reducedMotion} night={night} />
       <Boat motion={!props.reducedMotion} />
       <Explorer props={props} />
