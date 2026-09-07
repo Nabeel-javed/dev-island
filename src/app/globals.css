@@ -2338,3 +2338,83 @@ footer button {
     background: transparent;
   }
 }
+
+.studio-dialog {
+  width: min(760px, calc(100vw - 28px));
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+.profile-card-preview {
+  width: 100%;
+  height: auto;
+  border: 1px solid #d7decf;
+  border-radius: 12px;
+  margin: 8px 0 20px;
+}
+.studio-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  color: #3d6452;
+}
+.studio-dialog textarea,
+.studio-dialog input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd7c5;
+  border-radius: 8px;
+  background: #fffef8;
+  color: #29473b;
+  font: inherit;
+  box-sizing: border-box;
+}
+.studio-dialog textarea {
+  resize: vertical;
+  font-size: 12px;
+}
+.studio-primary,
+.studio-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #c7d3be;
+  border-radius: 9px;
+  padding: 12px 16px;
+  font: inherit;
+  font-size: 12px;
+}
+.studio-primary {
+  background: #205c50;
+  color: #fffef1;
+  margin-top: 14px;
+}
+.studio-secondary {
+  background: #f3f5e9;
+  color: #315c48;
+}
+.passport > .studio-secondary {
+  width: 100%;
+  margin-top: 9px;
+}
+.studio-dialog .studio-note {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.studio-dialog button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.studio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+@media (max-width: 760px) {
+  .passport > .studio-secondary {
+    grid-column: 1 / -1;
+  }
+}

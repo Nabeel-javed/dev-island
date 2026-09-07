@@ -35,6 +35,7 @@ import { usePassport } from './use-passport';
 import IslandGuide from './island-guide';
 import ExplorerPassport from './explorer-passport';
 import { projectKey } from '@/lib/project';
+const ProfileCard = dynamic(() => import('./profile-card'), { ssr: false });
 const ProjectRoom = dynamic(() => import('./project-room'), { ssr: false });
 const Pixel = dynamic(() => import('./pixel-island'), { ssr: false });
 const Three = dynamic(() => import('./three-island'), { ssr: false });
@@ -79,6 +80,7 @@ export default function IslandApp({
     [ready, setReady] = useState(false),
     [reducedMotion, setReducedMotion] = useState(false),
     [guideOpen, setGuideOpen] = useState(false),
+    [cardOpen, setCardOpen] = useState(false),
     [tourStep, setTourStep] = useState<number | null>(null),
     [toast, setToast] = useState(''),
     [username, setUsername] = useState(''),
@@ -111,7 +113,7 @@ export default function IslandApp({
   const controller = useController(
     island.projects.length,
     select,
-    selected !== null || about || guideOpen,
+    selected !== null || about || guideOpen || cardOpen,
   );
   const onReady = useCallback(() => setReady(true), []);
   const restoreDoorway = useCallback(() => {
@@ -635,6 +637,9 @@ export default function IslandApp({
               <button className="share-button" onClick={share}>
                 <Share2 size={15} /> Share this island <ArrowUpRight size={15} />
               </button>
+              <button className="studio-secondary" onClick={() => setCardOpen(true)}>
+                Add island to GitHub
+              </button>
               <p className="passport-note">A little world is better with visitors.</p>
             </aside>
           </div>
@@ -768,6 +773,15 @@ export default function IslandApp({
           </>
         ) : null}
       </dialog>
+      {cardOpen && (
+        <ProfileCard
+          island={island}
+          palette={palette}
+          style={style}
+          avatar={avatar}
+          onClose={() => setCardOpen(false)}
+        />
+      )}
       {toast && (
         <div className="toast" role="status">
           <Check size={16} />

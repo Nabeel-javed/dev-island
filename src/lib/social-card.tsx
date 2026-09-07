@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
-import { PALETTES, PaletteId } from './island';
-export function socialCard(username: string, palette: PaletteId = 'lagoon') {
+import { PALETTES, PaletteId, type Island } from './island';
+export function socialCard(username: string, palette: PaletteId = 'lagoon', island?: Island) {
   const p = PALETTES[palette];
   return new ImageResponse(
     <div
@@ -18,11 +18,18 @@ export function socialCard(username: string, palette: PaletteId = 'lagoon') {
         style={{ display: 'flex', flexDirection: 'column', width: 525, justifyContent: 'center' }}
       >
         <div style={{ fontSize: 25, letterSpacing: -1, color: '#205c50' }}>dev island.</div>
-        <div style={{ fontSize: 61, lineHeight: 1.05, letterSpacing: -3, marginTop: 40 }}>
-          Your code.
+        <div
+          style={{
+            fontSize: island && username.length > 16 ? 32 : 61,
+            lineHeight: 1.05,
+            letterSpacing: -2,
+            marginTop: 40,
+          }}
+        >
+          {island ? (username === 'demo' ? 'Alex’s island.' : `@${username}`) : 'Your code.'}
         </div>
         <div style={{ fontSize: 61, lineHeight: 1.05, letterSpacing: -3, color: '#7c9078' }}>
-          A world of its own.
+          {island ? 'Come explore.' : 'A world of its own.'}
         </div>
         <div style={{ fontSize: 23, marginTop: 30, color: '#7f8b77' }}>
           {username === 'demo'
@@ -30,7 +37,9 @@ export function socialCard(username: string, palette: PaletteId = 'lagoon') {
             : `Explore @${username}’s island.`}
         </div>
         <div style={{ fontSize: 16, marginTop: 40, color: '#83937d' }}>
-          WANDER · DISCOVER · MAKE IT YOURS
+          {island
+            ? `${island.projects.length} PROJECT ROOMS · CLICK TO VISIT`
+            : 'WANDER · DISCOVER · MAKE IT YOURS'}
         </div>
       </div>
       <div
@@ -92,7 +101,7 @@ export function socialCard(username: string, palette: PaletteId = 'lagoon') {
             background: '#ae8d60',
           }}
         />
-        {[0, 1, 2, 3, 4, 5].map((i) => (
+        {Array.from({ length: island ? island.projects.length : 6 }, (_, i) => (
           <div
             key={i}
             style={{
@@ -107,6 +116,24 @@ export function socialCard(username: string, palette: PaletteId = 'lagoon') {
               boxShadow: '7px 8px 0 #859a6c55',
             }}
           >
+            {island && (
+              <div
+                style={{
+                  display: 'flex',
+                  position: 'absolute',
+                  top: 65,
+                  left: -25,
+                  width: 114,
+                  justifyContent: 'center',
+                  fontSize: 12,
+                  color: p.accent,
+                }}
+              >
+                {island.projects[i].name.length > 16
+                  ? island.projects[i].name.slice(0, 15) + '…'
+                  : island.projects[i].name}
+              </div>
+            )}
             <svg
               width="80"
               height="36"
