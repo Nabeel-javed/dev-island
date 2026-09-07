@@ -28,6 +28,7 @@ test('empty profile remains supported', () => assert.deepEqual(selectProjects([]
 test('seed and appearance are stable and unknown presets fall back', () => {
   assert.equal(seed('demo'), seed('demo'));
   assert.deepEqual(readAppearance(new URLSearchParams('style=evil&avatar=bad&palette=no')), {
+    lighting: 'day',
     style: 'pixel',
     avatar: 'explorer',
     palette: 'lagoon',
