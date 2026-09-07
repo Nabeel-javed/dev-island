@@ -1,3 +1,4 @@
+import type { RepositoryOverview } from './repository-overview';
 import type { ProjectStory } from './story';
 export type Availability = 'available' | 'missing' | 'unavailable';
 export type ProjectDetails = {
@@ -24,6 +25,7 @@ export type ProjectDetails = {
     truncated: boolean;
   };
   source: 'github' | 'demo';
+  overview?: RepositoryOverview;
   notice?: string;
 };
 export function validRepository(repo: string) {

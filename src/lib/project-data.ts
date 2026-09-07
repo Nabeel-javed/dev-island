@@ -4,6 +4,7 @@ import { safeHomepage, validUsername } from './island';
 import { DEMO } from './demo';
 import { projectKey, validRepository, type ProjectDetails } from './project';
 import { renderReadme } from './readme';
+import { inspectRepository } from './repository-overview';
 import {
   createProjectCache,
   ProjectMemoryStore,
@@ -42,7 +43,18 @@ export async function fetchPublicProject(
     content = { ...content, status: 'available', truncated: true };
   } else if (!(readme.reason instanceof GitHubError && readme.reason.status === 404))
     content.status = 'unavailable';
+  const overview =
+    !repo.description?.trim() || !content.introduction.trim()
+      ? await inspectRepository(
+          path,
+          repo.owner.login,
+          repo.name,
+          repo.default_branch || 'main',
+          request,
+        )
+      : undefined;
   return {
+    overview,
     owner: repo.owner.login,
     name: repo.name,
     description: repo.description || '',
@@ -72,7 +84,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
   store = {
     async get(key) {
       try {
-        return await redis.get<ProjectSnapshot>('project:v2:' + key);
+        return await redis.get<ProjectSnapshot>('project:v3:' + key);
       } catch {
         return memory.get(key);
       }
@@ -80,7 +92,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
     async set(key, value) {
       await memory.set(key, value);
       try {
-        await redis.set('project:v2:' + key, value, { ex: 604800 });
+        await redis.set('project:v3:' + key, value, { ex: 604800 });
       } catch {
         console.warn(JSON.stringify({ event: 'project_cache_unavailable' }));
       }
@@ -88,7 +100,7 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
     async delete(key) {
       await memory.delete(key);
       try {
-        await redis.del('project:v2:' + key);
+        await redis.del('project:v3:' + key);
       } catch {
         console.warn(JSON.stringify({ event: 'project_cache_unavailable' }));
       }
