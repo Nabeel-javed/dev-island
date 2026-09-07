@@ -14,13 +14,13 @@ export default function RoomMaterial({ color, finish }: { color: string; finish:
       shader.fragmentShader = 'varying vec3 vGrain;\n' + shader.fragmentShader;
       const pattern =
         finish === 'wood'
-          ? 'sin(vGrain.x * 85.0 + sin(vGrain.z * 3.0) * 2.0 + sin(vGrain.z * 8.0) * 0.5) * 0.035 + sin(vGrain.z * 0.7 + vGrain.x * 9.0) * 0.025'
+          ? 'sin(vGrain.x * 85.0 + sin(vGrain.z * 3.0) * 2.0 + sin(vGrain.z * 8.0) * 0.5) * 0.018 + sin(vGrain.z * 0.7 + vGrain.x * 9.0) * 0.015'
           : finish === 'fabric'
             ? 'sin(vGrain.x * 160.0) * sin(vGrain.z * 160.0) * 0.045'
             : 'sin(vGrain.x * 121.0 + vGrain.y * 83.0) * sin(vGrain.y * 97.0 + vGrain.z * 137.0) * 0.018';
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <color_fragment>',
-        `#include <color_fragment>\ndiffuseColor.rgb *= 0.97 + ${pattern};`,
+        `#include <color_fragment>\nfloat grainDetail = ${pattern};\ndiffuseColor.rgb *= 0.98 + grainDetail * (1.0 - smoothstep(0.015, 0.09, length(fwidth(vGrain))));`,
       );
     },
     [finish],
