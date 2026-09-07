@@ -1,10 +1,12 @@
 'use client';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
 import { AVATARS, PALETTES, PLOTS, TREES, seed, type Day } from '@/lib/island';
-import type { SceneProps } from './pixel-island';
+import type { SceneProps as BaseSceneProps } from './pixel-island';
+import { trailerFrame } from '@/lib/trailer';
+type SceneProps = BaseSceneProps & { cinematic?: RefObject<number> };
 const V = (x: number, y: number, z: number): [number, number, number] => [x, y, z];
 function Box({
   position,
@@ -207,7 +209,7 @@ export function Explorer({
     </group>
   );
 }
-function FitCamera() {
+function FitCamera({ cinematic, count }: { cinematic?: RefObject<number>; count: number }) {
   const { camera, size } = useThree();
   useEffect(() => {
     if (camera instanceof THREE.OrthographicCamera) {
@@ -216,6 +218,14 @@ function FitCamera() {
       camera.updateProjectionMatrix();
     }
   }, [camera, size]);
+  useFrame(() => {
+    if (!cinematic || !(camera instanceof THREE.OrthographicCamera)) return;
+    const frame = trailerFrame(cinematic.current, count);
+    camera.position.set(...frame.position);
+    camera.lookAt(...frame.target);
+    camera.zoom = Math.min(size.width / 25.5, size.height / 22) * frame.zoom;
+    camera.updateProjectionMatrix();
+  });
   return null;
 }
 function Boat({ motion }: { motion: boolean }) {
@@ -311,7 +321,7 @@ function World(props: SceneProps) {
         shadow-camera-bottom={-15}
         shadow-normalBias={0.04}
       />
-      <FitCamera />
+      <FitCamera cinematic={props.cinematic} count={props.island.projects.length} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]} receiveShadow>
         <planeGeometry args={[200, 200]} />
         <meshStandardMaterial color={p.water} roughness={0.8} />

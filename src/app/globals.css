@@ -2418,3 +2418,52 @@ footer button {
     grid-column: 1 / -1;
   }
 }
+.trailer-dialog {
+  width: min(940px, calc(100vw - 28px));
+}
+.trailer-stage {
+  border: 1px solid #d7decf;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.trailer-scene {
+  aspect-ratio: 16 / 9;
+  position: relative;
+}
+.trailer-scene .scene-render {
+  width: 100%;
+  height: 100%;
+}
+.trailer-scene button {
+  display: none;
+}
+.trailer-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: #f8f7f1;
+  color: #315c48;
+  font-size: 13px;
+}
+.trailer-caption-bottom {
+  flex-direction: column;
+  gap: 5px;
+  min-height: 68px;
+}
+.trailer-caption small {
+  font-size: 11px;
+}
+.trailer-dialog > progress {
+  width: 100%;
+  height: 5px;
+  accent-color: #205c50;
+}
+.trailer-dialog .studio-actions .studio-primary {
+  margin-top: 0;
+}
+.trailer-output video {
+  width: 100%;
+  border-radius: 12px;
+  background: #b6d8d4;
+}
