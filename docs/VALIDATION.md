@@ -113,3 +113,11 @@ Production still has no configured GitHub token or Upstash credentials. Public R
 - Added rotating geometry over the technology desk, animated demo monitor bars, a moving book page and rising mug steam. Reduced motion fixes these animations and skips camera arrival interpolation/damping.
 - 51 tests, TypeScript, production build and formatting passed. Native Brave screenshots confirmed the close desktop interior, readable overlay README, emulated 390 × 680 mobile view, viewing-angle control and whole-room toggle. Mobile camera controls were moved below the character after visual review.
 - Physical-phone performance, Safari and pinch gestures on real touch hardware remain unmeasured. Reduced-motion handling was reviewed in source, not browser-emulated in this pass.
+
+### Shader water and interior materials — 2026-09-07
+
+- Replaced the flat ocean and separate expanding rings with a bounded vertex/fragment shader: slight wave displacement, moving surface highlights, shallow-water color and elliptical shoreline foam. Window shaders draw a day/night sky, sun/moon, hills and drifting daytime clouds, plus a soft decorative window-light patch on the floor.
+- Room standard materials now include world-space wood, plaster and fabric detail; fine grain fades with screen-space derivatives to reduce distant shimmer. Added staggered floorboard joints, lower wall panelling, window trim/sill and two warm wall sconces. These preserve existing walking bounds and station positions.
+- New animation uniforms freeze under reduced motion. Effects use no external textures, new dependencies or full-screen postprocessing passes. They are stylized shading, not scene reflections or physically traced window lighting.
+- 51 tests, TypeScript, production build and formatting passed. Native Brave screenshots confirmed day/night ocean rendering, day/night room materials and window scenery, README opening, and a 390 × 700 emulated night room. The visible development console showed existing library/extension warnings and no shader compilation errors during the room check.
+- Physical-phone frame rates, Safari and real-device GPU compatibility remain unmeasured. Reduced motion was reviewed in source rather than browser-emulated.
